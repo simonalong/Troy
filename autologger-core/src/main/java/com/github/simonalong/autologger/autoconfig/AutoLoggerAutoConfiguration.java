@@ -1,6 +1,5 @@
 package com.github.simonalong.autologger.autoconfig;
 
-
 import com.github.simonalong.autologger.endpoint.GroupListEndpoint;
 import com.github.simonalong.autologger.endpoint.ServiceEndPoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -20,6 +19,11 @@ public class AutoLoggerAutoConfiguration {
     public AutoLoggerBeanPostProcessor beanPostProcessor() {
         System.setProperty("management.endpoints.web.exposure.include", "logger-group, logger-fun");
         return new AutoLoggerBeanPostProcessor();
+    }
+
+    @Bean
+    public AutoLoggerAop autoLoggerAop() {
+        return new AutoLoggerAop();
     }
 
     @Configuration

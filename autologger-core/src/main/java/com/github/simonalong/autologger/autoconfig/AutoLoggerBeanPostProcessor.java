@@ -2,17 +2,16 @@ package com.github.simonalong.autologger.autoconfig;
 
 import com.github.simonalong.autologger.annotation.AutoLogger;
 import com.github.simonalong.autologger.log.LoggerInvoker;
-import com.github.simonalong.autologger.util.Pair;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.framework.AdvisedSupport;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.*;
 
 /**
  * @author jfWu
@@ -29,69 +28,48 @@ public class AutoLoggerBeanPostProcessor implements BeanPostProcessor {
         return beanWrapper(bean);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     private Object beanWrapper(Object bean) {
-        AutoLogger autoLogger;
-        Map<String, Pair<String[], String>> methodAutoLoggerMap = new HashMap<>();
-        for (Method declaredMethod : bean.getClass().getDeclaredMethods()) {
-            autoLogger = declaredMethod.getDeclaredAnnotation(AutoLogger.class);
-            if (null == autoLogger) {
-                autoLogger = bean.getClass().getDeclaredAnnotation(AutoLogger.class);
-                if (null == autoLogger) {
+        try {
+            Object target = bean;
+            if (AopUtils.isCglibProxy(bean)) {
+                target = getCglibProxyTargetObject(bean);
+            }
+
+            AutoLogger classLogger = target.getClass().getAnnotation(AutoLogger.class);
+            AutoLogger methodLogger;
+            for (Method declaredMethod : target.getClass().getDeclaredMethods()) {
+                methodLogger = declaredMethod.getDeclaredAnnotation(AutoLogger.class);
+                if (null == methodLogger) {
+                    methodLogger = classLogger;
+                }
+
+                if (null == methodLogger) {
                     continue;
                 }
-            }
 
-            if("".equals(autoLogger.value())) {
-                methodAutoLoggerMap.putIfAbsent(declaredMethod.toGenericString(), new Pair(autoLogger.group(), LoggerInvoker.generateMethodName(declaredMethod)));
-            } else {
-                methodAutoLoggerMap.putIfAbsent(declaredMethod.toGenericString(), new Pair(autoLogger.group(), autoLogger.value()));
+                if ("".equals(methodLogger.value())) {
+                    LoggerInvoker.put(methodLogger.group(), LoggerInvoker.generateMethodName(declaredMethod));
+                } else {
+                    LoggerInvoker.put(methodLogger.group(), methodLogger.value());
+                }
             }
-        }
-
-        if (!methodAutoLoggerMap.isEmpty()) {
-            Object wrapperBean = Proxy.newProxyInstance(bean.getClass().getClassLoader(), bean.getClass().getInterfaces(), new InvokeFactory(bean, methodAutoLoggerMap));
-            methodAutoLoggerMap.forEach((k, v) -> LoggerInvoker.put(v.getKey(), v.getValue(), wrapperBean));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return bean;
     }
 
-    static class InvokeFactory implements InvocationHandler {
+    /**
+     * 获取cglib代理对象的被代理对象
+     */
+    private Object getCglibProxyTargetObject(Object proxy) throws Exception {
+        Field h = proxy.getClass().getDeclaredField("CGLIB$CALLBACK_0");
+        h.setAccessible(true);
+        Object dynamicAdvisedInterceptor = h.get(proxy);
 
-        private final Object target;
-        private final Map<String, Pair<String[], String>> methodAutoLoggerMap;
+        Field advised = dynamicAdvisedInterceptor.getClass().getDeclaredField("advised");
+        advised.setAccessible(true);
 
-        public InvokeFactory(Object target, Map<String, Pair<String[], String>> methodAutoLoggerMap) {
-            this.target = target;
-            this.methodAutoLoggerMap = methodAutoLoggerMap;
-        }
-
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            if (methodAutoLoggerMap.containsKey(method.toGenericString())) {
-                try {
-                    preInvoke();
-                    Object result = Proxy.getInvocationHandler(target).invoke(proxy, method, args);
-                    postInvoke(method, args, result);
-                    return result;
-                } catch (Throwable e) {
-                    throwableInvoke(method, args, e);
-                    throw e;
-                }
-            }
-            return Proxy.getInvocationHandler(target).invoke(proxy, method, args);
-        }
-
-        private void preInvoke() {
-            LoggerInvoker.preInvoke();
-        }
-
-        private void postInvoke(Method method, Object[] args, Object result) {
-            LoggerInvoker.postInvoke(method, args, result);
-        }
-
-        private void throwableInvoke(Method method, Object[] args, Throwable throwable) {
-            LoggerInvoker.throwableInvoke(method, args, throwable);
-        }
+        return ((AdvisedSupport) advised.get(dynamicAdvisedInterceptor)).getTargetSource().getTarget();
     }
 }
