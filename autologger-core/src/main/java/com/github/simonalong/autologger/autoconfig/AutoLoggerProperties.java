@@ -10,7 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Getter
 @Setter
-@ConfigurationProperties("isyscore.autoLogger")
+@ConfigurationProperties("autoLogger")
 public class AutoLoggerProperties {
 
     /**

@@ -16,7 +16,7 @@ public @interface AutoLogger {
      *
      * @return 分组
      */
-    String[] group() default "_default_";
+    String[] group() default "default";
 
     /**
      * 对日志的名字标示

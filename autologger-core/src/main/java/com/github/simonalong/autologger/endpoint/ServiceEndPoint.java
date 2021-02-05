@@ -1,29 +1,35 @@
 package com.github.simonalong.autologger.endpoint;
 
+import com.github.simonalong.autologger.log.LoggerBeanWrapperRsp;
 import com.github.simonalong.autologger.log.LoggerInvoker;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.Selector;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
+import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 /**
  * @author shizi
  * @since 2021-02-02 23:48:02
  */
-@Endpoint(id = "logger-service")
+@Component
+@Endpoint(id = "logger-fun")
 public class ServiceEndPoint {
 
     @ReadOperation
-    public Set<String> logNameSet(@Selector String group) {
-        return LoggerInvoker.getLogNameSet(group);
+    public Set<String> getFunList(@Selector String arg0) {
+        return LoggerInvoker.getFunList(arg0);
+    }
+
+    @ReadOperation
+    public LoggerBeanWrapperRsp getLoggerInfo(@Selector String arg0, @Selector String arg1) {
+        return LoggerInvoker.getLoggerInfo(arg0, arg1);
     }
 
     @WriteOperation
-    public Integer update(@Selector String group) {
-        return 0;
+    public Integer updateLoggerBeanLog(@Selector String arg0, @Selector String arg1, @Selector String arg2, @Selector String arg3) {
+        return LoggerInvoker.updateLoggerBeanLog(arg0, arg1, arg2, Boolean.valueOf(arg3));
     }
 }
