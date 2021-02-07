@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 
 /**
- * @author robot
+ * @author shizi
+ * @since 2021-02-02 23:55:54
  */
 @Slf4j
 @Aspect
@@ -24,16 +25,10 @@ public class AutoLoggerAop {
      * 拦截方法中添加注解{@link com.github.simonalong.autologger.annotation.AutoLogger}的类和方法
      */
     @Around("@annotation(com.github.simonalong.autologger.annotation.AutoLogger) || @within(com.github.simonalong.autologger.annotation.AutoLogger)")
-    public Object aroundParamFun1(ProceedingJoinPoint pjp) throws Throwable {
+    public Object aroundParamFun(ProceedingJoinPoint pjp) throws Throwable {
         Signature sig = pjp.getSignature();
         MethodSignature methodSignature = (MethodSignature) sig;
-
-        Method currentMethod;
-        try {
-            currentMethod = pjp.getTarget().getClass().getMethod(methodSignature.getName(), methodSignature.getParameterTypes());
-        } catch (NoSuchMethodException e) {
-            throw e;
-        }
+        Method currentMethod = pjp.getTarget().getClass().getMethod(methodSignature.getName(), methodSignature.getParameterTypes());
 
         AutoLogger autoLogger = null;
         if (currentMethod.getDeclaringClass().isAnnotationPresent(AutoLogger.class)) {

@@ -1,6 +1,5 @@
 package com.github.simonalong.autologger.endpoint;
 
-
 import com.github.simonalong.autologger.log.LoggerInvoker;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
@@ -10,13 +9,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
+import static com.github.simonalong.autologger.AutoLoggerConstant.AUTO_GROUP;
+
 /**
  * @author shizi
  * @since 2021-02-02 23:36:28
  */
 @Component
-@Endpoint(id = "logger-group")
-public class GroupListEndpoint {
+@Endpoint(id = AUTO_GROUP)
+public class AutoGroupEndpoint {
 
     @ReadOperation
     public Set<String> groups() {

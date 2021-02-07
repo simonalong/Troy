@@ -10,13 +10,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
+import static com.github.simonalong.autologger.AutoLoggerConstant.AUTO_FUN;
+
 /**
  * @author shizi
  * @since 2021-02-02 23:48:02
  */
 @Component
-@Endpoint(id = "logger-fun")
-public class ServiceEndPoint {
+@Endpoint(id = AUTO_FUN)
+public class AutoFunEndPoint {
 
     @ReadOperation
     public Set<String> getFunList(@Selector String arg0) {
