@@ -13,7 +13,6 @@ import static com.github.simonalong.autologger.AutoLoggerConstant.LOGGER_SEARCH;
  * @author shizi
  * @since 2021-02-02 23:36:28
  */
-@Component
 @Endpoint(id = LOGGER_SEARCH)
 public class LoggerSearchEndpoint {
 

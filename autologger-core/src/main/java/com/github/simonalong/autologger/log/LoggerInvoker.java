@@ -102,6 +102,14 @@ public class LoggerInvoker {
         return wrapperRsp;
     }
 
+    /**
+     * 更新组的所有函数
+     *
+     * @param group 分组
+     * @param logLevelName 日志级别
+     * @param enable 激活标示
+     * @return 更改结果：0-没有变更，n-变更个数
+     */
     public Integer updateLoggerBeanLog(String group, String logLevelName, Boolean enable) {
         if (null == group) {
             return 0;

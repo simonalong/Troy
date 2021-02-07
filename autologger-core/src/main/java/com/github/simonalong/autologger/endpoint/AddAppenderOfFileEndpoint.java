@@ -10,7 +10,6 @@ import static com.github.simonalong.autologger.AutoLoggerConstant.ADD_APPENDER_F
  * @author shizi
  * @since 2021-02-02 23:36:28
  */
-@Component
 @Endpoint(id = ADD_APPENDER_FILE)
 public class AddAppenderOfFileEndpoint {
 
@@ -24,7 +23,11 @@ public class AddAppenderOfFileEndpoint {
      */
     @WriteOperation
     public Integer addAppenderToFile(@Selector String arg0, @Selector String arg1, @Selector String arg2) {
-        return DynamicLogUtils.addAppenderToFile(arg0, arg1, arg2);
+        if (null == arg2 || "".equals(arg2)) {
+            return 0;
+        }
+
+        return DynamicLogUtils.addAppenderToFile(arg0, arg1, arg2.replace("=", "/"));
     }
 
     /**

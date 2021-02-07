@@ -10,7 +10,6 @@ import static com.github.simonalong.autologger.AutoLoggerConstant.ADD_APPENDER_C
  * @author shizi
  * @since 2021-02-02 23:36:28
  */
-@Component
 @Endpoint(id = ADD_APPENDER_CONSOLE)
 public class AddAppenderOfConsoleEndpoint {
 

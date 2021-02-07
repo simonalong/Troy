@@ -12,7 +12,6 @@ import static com.github.simonalong.autologger.AutoLoggerConstant.LOGGER_ROOT_SE
  * @author shizi
  * @since 2021-02-02 23:36:28
  */
-@Component
 @Endpoint(id = LOGGER_ROOT_SET)
 public class LoggerRootSetEndpoint {
 
