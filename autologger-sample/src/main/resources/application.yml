@@ -1,2 +1,2 @@
-#autoLogger:
-#  enable: false
+#auto-logger:
+#  basePath: /api/test/sample

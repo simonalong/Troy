@@ -3,6 +3,7 @@ package com.github.simonalong.autologger.autoconfig;
 import com.github.simonalong.autologger.endpoint.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,14 +17,16 @@ import static com.github.simonalong.autologger.AutoLoggerConstant.*;
  * @author shizi
  * @since 2021-02-02 23:45:24
  */
+@EnableConfigurationProperties(AutoLoggerProperties.class)
 @ConditionalOnExpression("#{''.equals('${autoLogger.enable:}') or 'true'.equals('${autoLogger.enable}')}")
 @Configuration
 public class AutoLoggerAutoConfiguration {
 
     @Bean
-    public AutoLoggerBeanPostProcessor beanPostProcessor() {
+    public AutoLoggerBeanPostProcessor beanPostProcessor(AutoLoggerProperties autoLoggerProperties) {
         List<String> endpointList = Arrays.asList(AUTO_FUN, AUTO_GROUP, ADD_APPENDER_CONSOLE, ADD_APPENDER_FILE, LOGGER_SEARCH, LOGGER_ROOT_SET);
         System.setProperty("management.endpoints.web.exposure.include", String.join(", ", endpointList));
+        System.setProperty("management.endpoints.web.basePath", autoLoggerProperties.getBasePath());
         return new AutoLoggerBeanPostProcessor();
     }
 
