@@ -47,8 +47,8 @@ public class XxxService {
 输出：
 ```json
 [
-    "fun: 436b1181267238e5958a8be0c1701ebe691ebf8c0038ea1b9179bd34de74fddc = com.simon.base.service1.TestService#postFun(com.simon.base.controller1.Fun1Req)",
-    "fun: 6581075c99b768d2d708432255fcee0d94cea6afa53d290c9317f9ce42475ee8 = com.simon.base.controller1.TestController#postFun(com.simon.base.controller1.Fun1Req)"
+    "fun: 436b1181267238e5958a8be0c1701ebe691ebf8c0038ea1b9179bd34de74fddc = com.xxx.service1.TestService#postFun(com.xxx.controller1.Fun1Req)",
+    "fun: 6581075c99b768d2d708432255fcee0d94cea6afa53d290c9317f9ce42475ee8 = com.xxx.controller1.TestController#postFun(com.xxx.controller1.Fun1Req)"
 ]
 ```
 说明：
@@ -91,7 +91,7 @@ public class XxxService {
 ### 日志中的打印
 打开自动化日志后，业务运行到某个函数，会自动打印
 ```text
-[auto-logger] 结果：{"response":{"age":12,"name":"ok"},"parameters":[{"age":12,"name":"test"}],"fun":"public com.simon.base.controller1.FunRsp com.simon.base.controller1.TestController.postFun(com.simon.base.controller1.Fun1Req)"}
+[auto-logger] 结果：{"response":{"age":12,"name":"ok"},"parameters":[{"age":12,"name":"test"}],"fun":"public com.xxx.controller1.FunRsp com.xxx.controller1.TestController.postFun(com.xxx.controller1.Fun1Req)"}
 ```
 ```json
 {
@@ -105,7 +105,7 @@ public class XxxService {
       "name":"test"
     }
   ],
-  "fun":"public com.simon.base.controller1.FunRsp com.simon.base.controller1.TestController.postFun(com.simon.base.controller1.Fun1Req)"
+  "fun":"public com.xxx.controller1.FunRsp com.xxx.controller1.TestController.postFun(com.xxx.controller1.Fun1Req)"
 }
 ```
 目前打印三个字段：
