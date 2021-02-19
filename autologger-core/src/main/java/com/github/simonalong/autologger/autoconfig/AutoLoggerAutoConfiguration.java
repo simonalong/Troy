@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +15,7 @@ import static com.github.simonalong.autologger.AutoLoggerConstant.*;
 
 /**
  * 不存在{@code autoLogger.enable}或者该配置为true时候生效
+ *
  * @author shizi
  * @since 2021-02-02 23:45:24
  */
@@ -26,7 +28,11 @@ public class AutoLoggerAutoConfiguration {
     public AutoLoggerBeanPostProcessor beanPostProcessor(AutoLoggerProperties autoLoggerProperties) {
         List<String> endpointList = Arrays.asList(AUTO_FUN, AUTO_GROUP, ADD_APPENDER_CONSOLE, ADD_APPENDER_FILE, LOGGER_SEARCH, LOGGER_ROOT_SET);
         System.setProperty("management.endpoints.web.exposure.include", String.join(", ", endpointList));
-        System.setProperty("management.endpoints.web.basePath", autoLoggerProperties.getBasePath());
+        String basePath = autoLoggerProperties.getBasePath();
+        if (!StringUtils.isEmpty(basePath)) {
+            System.setProperty("management.endpoints.web.basePath", autoLoggerProperties.getBasePath());
+        }
+
         return new AutoLoggerBeanPostProcessor();
     }
 
