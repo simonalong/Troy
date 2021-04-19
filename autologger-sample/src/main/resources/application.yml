@@ -1,2 +1,3 @@
-#auto-logger:
-#  basePath: /api/test/sample
+#log:
+#  auto-logger:
+#    prefix: /api/test/sample

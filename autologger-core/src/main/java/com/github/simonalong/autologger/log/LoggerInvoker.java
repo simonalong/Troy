@@ -1,9 +1,9 @@
 package com.github.simonalong.autologger.log;
 
 import com.alibaba.fastjson.JSON;
-import com.github.simonalong.autologger.annotation.AutoLogger;
+import com.github.simonalong.autologger.annotation.WatchLogger;
 import com.github.simonalong.autologger.util.EncryptUtil;
-import lombok.Data;
+import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.logging.LogLevel;
@@ -27,7 +27,8 @@ public class LoggerInvoker {
     /**
      * 日志映射管理map，key为group, value为map： key为logName实体（如果logName为空，则为函数的类全限定名加上#，再加上函数名）, value为bean的日志包装类
      */
-    private final Map<String, Map<LogFunEntity, LoggerBeanWrapper>> loggerProxyMap = new HashMap<>();
+    @Getter
+    private final Map<String, Map<String, FunLoggerBeanWrapper>> loggerProxyMap = new HashMap<>();
     private final Map<Integer, LogLevel> logLevelIndexMap;
     private final Map<String, LogLevel> logLevelNameMap;
 
@@ -39,11 +40,11 @@ public class LoggerInvoker {
     public void put(String[] groups, String logFunName) {
         Arrays.stream(groups).forEach(group -> loggerProxyMap.compute(group, (k, v) -> {
             if (null == v) {
-                Map<LogFunEntity, LoggerBeanWrapper> loggerBeanWrapperMap = new HashMap<>();
-                loggerBeanWrapperMap.put(new LogFunEntity(EncryptUtil.SHA256(logFunName), logFunName), new LoggerBeanWrapper());
+                Map<String, FunLoggerBeanWrapper> loggerBeanWrapperMap = new HashMap<>();
+                loggerBeanWrapperMap.put(EncryptUtil.SHA256(logFunName), new FunLoggerBeanWrapper(logFunName));
                 return loggerBeanWrapperMap;
             } else {
-                v.putIfAbsent(new LogFunEntity(EncryptUtil.SHA256(logFunName), logFunName), new LoggerBeanWrapper());
+                v.putIfAbsent(EncryptUtil.SHA256(logFunName), new FunLoggerBeanWrapper(logFunName));
                 return v;
             }
         }));
@@ -59,12 +60,12 @@ public class LoggerInvoker {
     public Boolean enableLogger(String[] groups, String logFunName) {
         for (String group : groups) {
             if (loggerProxyMap.containsKey(group)) {
-                Map<LogFunEntity, LoggerBeanWrapper> beanWrapperMap = loggerProxyMap.get(group);
-                LogFunEntity logFunEntity = new LogFunEntity(EncryptUtil.SHA256(logFunName), logFunName);
-                if (!beanWrapperMap.containsKey(logFunEntity)) {
+                Map<String, FunLoggerBeanWrapper> beanWrapperMap = loggerProxyMap.get(group);
+                String funId = EncryptUtil.SHA256(logFunName);
+                if (!beanWrapperMap.containsKey(funId)) {
                     continue;
                 }
-                LoggerBeanWrapper beanWrapper = beanWrapperMap.get(logFunEntity);
+                FunLoggerBeanWrapper beanWrapper = beanWrapperMap.get(funId);
                 if (beanWrapper.openLogger()) {
                     return true;
                 }
@@ -78,27 +79,27 @@ public class LoggerInvoker {
         return loggerProxyMap.keySet();
     }
 
-    public Set<String> getFunList(String group) {
+    public Set<String> getFunSet(String group) {
         if (loggerProxyMap.containsKey(group)) {
-            return loggerProxyMap.get(group).keySet().stream().map(e -> MessageFormat.format("fun: {0} = {1}", e.getLogFunId(), e.getLogFunName())).collect(Collectors.toSet());
+            return loggerProxyMap.get(group).entrySet().stream().map(e -> MessageFormat.format("fun: {0} = {1}", e.getKey(), e.getValue().getLogFunName())).collect(Collectors.toSet());
         }
         return Collections.emptySet();
     }
 
-    public LoggerBeanWrapperRsp getLoggerInfo(String group, String logFunId) {
+    public com.github.simonalong.autologger.log.LoggerBeanWrapperRsp getLoggerInfo(String group, String logFunId) {
         if (!loggerProxyMap.containsKey(group)) {
             return null;
         }
-        Map<LogFunEntity, LoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
-        LogFunEntity logFunEntity = new LogFunEntity(logFunId, null);
-        if (!loggerBeanWrapperMap.containsKey(logFunEntity)) {
+        Map<String, FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
+        if (!loggerBeanWrapperMap.containsKey(logFunId)) {
             return null;
         }
 
-        LoggerBeanWrapper loggerBeanWrapper = loggerBeanWrapperMap.get(logFunEntity);
-        LoggerBeanWrapperRsp wrapperRsp = new LoggerBeanWrapperRsp();
-        wrapperRsp.setLogLevel(loggerBeanWrapper.getLogLevel());
-        wrapperRsp.setLoggerEnable(loggerBeanWrapper.getLoggerEnable());
+        FunLoggerBeanWrapper funLoggerBeanWrapper = loggerBeanWrapperMap.get(logFunId);
+        com.github.simonalong.autologger.log.LoggerBeanWrapperRsp wrapperRsp = new com.github.simonalong.autologger.log.LoggerBeanWrapperRsp();
+        wrapperRsp.setLogLevel(funLoggerBeanWrapper.getLogLevel());
+        wrapperRsp.setLoggerEnable(funLoggerBeanWrapper.getLoggerEnable());
+        wrapperRsp.setLogFunName(funLoggerBeanWrapper.getLogFunName());
         return wrapperRsp;
     }
 
@@ -106,11 +107,11 @@ public class LoggerInvoker {
      * 更新组的所有函数
      *
      * @param group 分组
-     * @param logLevelName 日志级别
+     * @param logLevel 日志级别
      * @param enable 激活标示
      * @return 更改结果：0-没有变更，n-变更个数
      */
-    public Integer updateLoggerBeanLog(String group, String logLevelName, Boolean enable) {
+    public Integer updateLoggerBeanLog(String group, String logLevel, Boolean enable) {
         if (null == group) {
             return 0;
         }
@@ -119,13 +120,13 @@ public class LoggerInvoker {
             return 0;
         }
 
-        Map<LogFunEntity, LoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
-        loggerBeanWrapperMap.values().forEach(loggerBeanWrapper->{
-            if (null != logLevelName) {
-                loggerBeanWrapper.setLogLevel(parseLogLevel(logLevelName));
+        Map<String, FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
+        loggerBeanWrapperMap.values().forEach(funLoggerBeanWrapper ->{
+            if (null != logLevel) {
+                funLoggerBeanWrapper.setLogLevel(parseLogLevel(logLevel));
             }
             if (null != enable) {
-                loggerBeanWrapper.setLoggerEnable(enable);
+                funLoggerBeanWrapper.setLoggerEnable(enable);
             }
         });
         return loggerBeanWrapperMap.values().size();
@@ -135,13 +136,13 @@ public class LoggerInvoker {
      * 更新bean的日志
      *
      * @param group        日志分组
-     * @param logFunId     日志函数标示
+     * @param funId     日志函数标示
      * @param logLevelName 日志级别
      * @param enable       日志激活标示
      * @return 更新结果标示：0-没有更新成功，1-更新成功
      */
-    public Integer updateLoggerBeanLog(String group, String logFunId, String logLevelName, Boolean enable) {
-        if (null == group || null == logFunId) {
+    public Integer updateLoggerBeanLog(String group, String funId, String logLevelName, Boolean enable) {
+        if (null == group || null == funId) {
             return 0;
         }
 
@@ -149,18 +150,17 @@ public class LoggerInvoker {
             return 0;
         }
 
-        Map<LogFunEntity, LoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
-        LogFunEntity logFunEntity = new LogFunEntity(logFunId, null);
-        if (!loggerBeanWrapperMap.containsKey(logFunEntity)) {
+        Map<String, FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
+        if (!loggerBeanWrapperMap.containsKey(funId)) {
             return 0;
         }
 
-        LoggerBeanWrapper loggerBeanWrapper = loggerBeanWrapperMap.get(logFunEntity);
+        FunLoggerBeanWrapper funLoggerBeanWrapper = loggerBeanWrapperMap.get(funId);
         if (null != logLevelName) {
-            loggerBeanWrapper.setLogLevel(parseLogLevel(logLevelName));
+            funLoggerBeanWrapper.setLogLevel(parseLogLevel(logLevelName));
         }
         if (null != enable) {
-            loggerBeanWrapper.setLoggerEnable(enable);
+            funLoggerBeanWrapper.setLoggerEnable(enable);
         }
         return 1;
     }
@@ -173,40 +173,40 @@ public class LoggerInvoker {
      * @param result 返回值
      */
     public void postInvoke(Method method, Object[] args, Object result) {
-        AutoLogger autoLogger = null;
-        if (method.getDeclaringClass().isAnnotationPresent(AutoLogger.class)) {
-            autoLogger = method.getDeclaringClass().getAnnotation(AutoLogger.class);
+        WatchLogger watchLogger = null;
+        if (method.getDeclaringClass().isAnnotationPresent(WatchLogger.class)) {
+            watchLogger = method.getDeclaringClass().getAnnotation(WatchLogger.class);
         }
 
-        if (method.isAnnotationPresent(AutoLogger.class)) {
-            autoLogger = method.getAnnotation(AutoLogger.class);
+        if (method.isAnnotationPresent(WatchLogger.class)) {
+            watchLogger = method.getAnnotation(WatchLogger.class);
         }
 
-        if (null == autoLogger) {
+        if (null == watchLogger) {
             return;
         }
 
-        String[] groups = autoLogger.group();
-        String logName = autoLogger.value();
+        String[] groups = watchLogger.group();
+        String logName = watchLogger.value();
         if ("".equals(logName)) {
             logName = generateMethodName(method);
         }
 
         for (String group : groups) {
-            Map<LogFunEntity, LoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
-            LogFunEntity logFunEntity = new LogFunEntity(EncryptUtil.SHA256(logName), logName);
-            if (!loggerBeanWrapperMap.containsKey(logFunEntity)) {
+            Map<String, FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
+            String funId = EncryptUtil.SHA256(logName);
+            if (!loggerBeanWrapperMap.containsKey(funId)) {
                 continue;
             }
 
-            LoggerBeanWrapper loggerBeanWrapper = loggerBeanWrapperMap.get(logFunEntity);
-            if (!loggerBeanWrapper.openLogger()) {
+            FunLoggerBeanWrapper funLoggerBeanWrapper = loggerBeanWrapperMap.get(funId);
+            if (!funLoggerBeanWrapper.openLogger()) {
                 return;
             }
 
             HashMap<String, Object> outInfo = new HashMap<>();
             outInfo.put("response", result);
-            printLog(loggerBeanWrapper, outInfo, method, args);
+            printLog(funLoggerBeanWrapper, outInfo, method, args);
             return;
         }
     }
@@ -220,46 +220,46 @@ public class LoggerInvoker {
      */
     @SuppressWarnings("all")
     public void throwableInvoke(Method method, Object[] args, Throwable throwable) {
-        AutoLogger autoLogger = null;
-        if (method.getDeclaringClass().isAnnotationPresent(AutoLogger.class)) {
-            autoLogger = method.getDeclaringClass().getAnnotation(AutoLogger.class);
+        WatchLogger watchLogger = null;
+        if (method.getDeclaringClass().isAnnotationPresent(WatchLogger.class)) {
+            watchLogger = method.getDeclaringClass().getAnnotation(WatchLogger.class);
         }
 
-        if (method.isAnnotationPresent(AutoLogger.class)) {
-            autoLogger = method.getAnnotation(AutoLogger.class);
+        if (method.isAnnotationPresent(WatchLogger.class)) {
+            watchLogger = method.getAnnotation(WatchLogger.class);
         }
 
-        if (null == autoLogger) {
+        if (null == watchLogger) {
             return;
         }
 
-        String[] groups = autoLogger.group();
-        String logName = autoLogger.value();
+        String[] groups = watchLogger.group();
+        String logName = watchLogger.value();
         if (null == logName || "".equals(logName)) {
             logName = generateMethodName(method);
         }
 
         for (String group : groups) {
-            Map<LogFunEntity, LoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
-            LogFunEntity logFunEntity = new LogFunEntity(EncryptUtil.SHA256(logName), logName);
-            if (!loggerBeanWrapperMap.containsKey(logFunEntity)) {
+            Map<String, FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
+            String funId = EncryptUtil.SHA256(logName);
+            if (!loggerBeanWrapperMap.containsKey(funId)) {
                 continue;
             }
 
-            LoggerBeanWrapper loggerBeanWrapper = loggerBeanWrapperMap.get(logFunEntity);
-            if (!loggerBeanWrapper.openLogger()) {
+            FunLoggerBeanWrapper funLoggerBeanWrapper = loggerBeanWrapperMap.get(funId);
+            if (!funLoggerBeanWrapper.openLogger()) {
                 return;
             }
 
             HashMap<String, Object> outInfo = new HashMap<>();
             outInfo.put("throwable", throwable);
 
-            printLog(loggerBeanWrapper, outInfo, method, args);
+            printLog(funLoggerBeanWrapper, outInfo, method, args);
             return;
         }
     }
 
-    private void printLog(LoggerBeanWrapper beanWrapper, HashMap<String, Object> outInfo, Method method, Object[] args) {
+    private void printLog(FunLoggerBeanWrapper beanWrapper, HashMap<String, Object> outInfo, Method method, Object[] args) {
         outInfo.put("fun", method.toString());
         outInfo.put("parameters", Arrays.asList(args));
 
@@ -288,17 +288,6 @@ public class LoggerInvoker {
         }
     }
 
-    @Data
-    private class LoggerBeanWrapper {
-
-        private LogLevel logLevel = LogLevel.INFO;
-        private Boolean loggerEnable = false;
-
-        public Boolean openLogger() {
-            return loggerEnable;
-        }
-    }
-
     public static LogLevel parseLogLevel(Integer index) {
         if (null == index) {
             return LogLevel.OFF;
@@ -309,14 +298,14 @@ public class LoggerInvoker {
         return logLevelIndexMap.get(index);
     }
 
-    public static LogLevel parseLogLevel(String name) {
-        if (null == name || "".equals(name)) {
+    public static LogLevel parseLogLevel(String logLevel) {
+        if (null == logLevel || "".equals(logLevel)) {
             return LogLevel.OFF;
         }
-        if (!logLevelNameMap.containsKey(name.trim().toUpperCase())) {
-            throw new RuntimeException("不支持name: " + name.trim().toUpperCase());
+        if (!logLevelNameMap.containsKey(logLevel.trim().toUpperCase())) {
+            throw new RuntimeException("不支持name: " + logLevel.trim().toUpperCase());
         }
-        return logLevelNameMap.get(name.trim().toUpperCase());
+        return logLevelNameMap.get(logLevel.trim().toUpperCase());
     }
 
     public String generateMethodName(Method method) {

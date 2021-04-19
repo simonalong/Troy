@@ -1,13 +1,12 @@
 package com.github.simonalong.autologger.autoconfig;
 
-import com.github.simonalong.autologger.annotation.AutoLogger;
+import com.github.simonalong.autologger.annotation.WatchLogger;
 import com.github.simonalong.autologger.log.LoggerInvoker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.framework.AdvisedSupport;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +15,7 @@ import java.lang.reflect.Method;
 
 /**
  * @author shizi
- * @since 2021-02-02 23:33:19
+ * @version 1.0
  */
 @Component
 @Slf4j
@@ -24,7 +23,7 @@ public class AutoLoggerBeanPostProcessor implements BeanPostProcessor {
 
     @Override
     @Nullable
-    public Object postProcessAfterInitialization(@NonNull Object bean,@NonNull String beanName) throws BeansException {
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         return beanWrapper(bean);
     }
 
@@ -35,10 +34,10 @@ public class AutoLoggerBeanPostProcessor implements BeanPostProcessor {
                 target = getCglibProxyTargetObject(bean);
             }
 
-            AutoLogger classLogger = target.getClass().getAnnotation(AutoLogger.class);
-            AutoLogger methodLogger;
+            WatchLogger classLogger = target.getClass().getAnnotation(WatchLogger.class);
+            WatchLogger methodLogger;
             for (Method declaredMethod : target.getClass().getDeclaredMethods()) {
-                methodLogger = declaredMethod.getDeclaredAnnotation(AutoLogger.class);
+                methodLogger = declaredMethod.getDeclaredAnnotation(WatchLogger.class);
                 if (null == methodLogger) {
                     methodLogger = classLogger;
                 }

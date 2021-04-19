@@ -46,19 +46,25 @@ public class DynamicLogUtils {
         add(Level.ALL.toString());
     }};
 
+    public String getLevelOfRoot() {
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        ch.qos.logback.classic.Logger logger = loggerContext.getLogger("root");
+        return logger.getLevel().levelStr;
+    }
+
     /**
      * 设置根目录的日志级别
      *
-     * @param levelStr logback的日志级别对应的字符：ALL(all)，TRACE(trace)，DEBUG(debug)，INFO(info)，WARN(warn)，ERROR(error)，OFF(off)
+     * @param logLevel logback的日志级别对应的字符：ALL(all)，TRACE(trace)，DEBUG(debug)，INFO(info)，WARN(warn)，ERROR(error)，OFF(off)
      * @return 操作结果：0-没有修改，1-修改完成
      */
-    public Integer setLevelOfRoot(String levelStr) {
-        if (null == levelStr || "".equals(levelStr) || !logLevelSet.contains(levelStr.toUpperCase())) {
+    public Integer setLevelOfRoot(String logLevel) {
+        if (null == logLevel || "".equals(logLevel) || !logLevelSet.contains(logLevel.toUpperCase())) {
             return 0;
         }
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         ch.qos.logback.classic.Logger logger = loggerContext.getLogger("root");
-        logger.setLevel(Level.toLevel(levelStr));
+        logger.setLevel(Level.toLevel(logLevel));
         return 1;
     }
 
@@ -71,6 +77,11 @@ public class DynamicLogUtils {
     public List<Logger> getLoggerList(String loggerNamePre) {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         return loggerContext.getLoggerList().stream().filter(logger -> logger.getName().startsWith(loggerNamePre)).collect(Collectors.toList());
+    }
+
+    public List<Logger> getAllLoggerList() {
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        return loggerContext.getLoggerList();
     }
 
     /**
@@ -106,6 +117,22 @@ public class DynamicLogUtils {
         return 1;
     }
 
+    public Integer deleteAppender(String loggerName) {
+        if (null == loggerName || "".equals(loggerName)) {
+            return 0;
+        }
+
+        // 获取logger
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        Logger logger = loggerContext.getLogger(loggerName);
+        if (null == logger) {
+            return 0;
+        }
+
+        logger.detachAppender(loggerName);
+        return 1;
+    }
+
     /**
      * 删除Logger中的appender
      *
@@ -133,11 +160,10 @@ public class DynamicLogUtils {
      *
      * @param loggerName  logger名字
      * @param logLevelStr 日志级别
-     * @param logHome     指定的日志的Home地址
      * @return 添加结果：0-没有添加成功，1-添加成功
      */
-    public Integer addAppenderToFile(String loggerName, String logLevelStr, String logHome) {
-        if (null == loggerName || "".equals(loggerName) || null == logLevelStr || "".equals(logLevelStr) || null == logHome || "".equals(logHome)) {
+    public Integer addAppenderToFile(String loggerName, String logLevelStr) {
+        if (null == loggerName || "".equals(loggerName) || null == logLevelStr || "".equals(logLevelStr)) {
             return 0;
         }
 
@@ -158,8 +184,12 @@ public class DynamicLogUtils {
         Level level = Level.toLevel(logLevelStr);
         // 设置当前日志级别
         logger.setLevel(level);
-        logger.addAppender(generateFileAppender(loggerContext, loggerName, level, logHome));
+        logger.addAppender(generateFileAppender(loggerContext, loggerName, level, getLogHome(loggerContext)));
         return 1;
+    }
+
+    private String getLogHome(LoggerContext loggerContext) {
+        return loggerContext.getCopyOfPropertyMap().get("LOG_HOME");
     }
 
     /**
@@ -181,6 +211,9 @@ public class DynamicLogUtils {
         }
 
         logger.detachAppender(generateAppenderNameOfFile(loggerName));
+
+        // 恢复继承ROOT级别
+        logger.setAdditive(true);
         return 1;
     }
 

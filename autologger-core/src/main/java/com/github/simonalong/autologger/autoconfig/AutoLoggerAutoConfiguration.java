@@ -1,36 +1,40 @@
 package com.github.simonalong.autologger.autoconfig;
 
 import com.github.simonalong.autologger.endpoint.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.StringUtils;
+import org.springframework.core.env.Environment;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.simonalong.autologger.AutoLoggerConstant.*;
+import static com.github.simonalong.autologger.AutoLoggerConstants.*;
 
 /**
- * 不存在{@code autoLogger.enable}或者该配置为true时候生效
- *
  * @author shizi
  * @since 2021-02-02 23:45:24
  */
+@Slf4j
 @EnableConfigurationProperties(AutoLoggerProperties.class)
-@ConditionalOnExpression("#{''.equals('${autoLogger.enable:}') or 'true'.equals('${autoLogger.enable}')}")
+@ConditionalOnExpression("#{''.equals('${log.auto-logger.enable:}') or 'true'.equals('${log.auto-logger.enable}')}")
 @Configuration
 public class AutoLoggerAutoConfiguration {
 
+    @Autowired
+    private Environment environment;
+
     @Bean
     public AutoLoggerBeanPostProcessor beanPostProcessor(AutoLoggerProperties autoLoggerProperties) {
-        List<String> endpointList = Arrays.asList(AUTO_FUN, AUTO_GROUP, ADD_APPENDER_CONSOLE, ADD_APPENDER_FILE, LOGGER_SEARCH, LOGGER_ROOT_SET);
+        List<String> endpointList = Arrays.asList(GROUP, LOGGER, APPENDER);
         System.setProperty("management.endpoints.web.exposure.include", String.join(", ", endpointList));
-        String basePath = autoLoggerProperties.getBasePath();
-        if (!StringUtils.isEmpty(basePath)) {
-            System.setProperty("management.endpoints.web.basePath", autoLoggerProperties.getBasePath());
+        String apiPrefix = autoLoggerProperties.getPrefix();
+        if (null != apiPrefix && !"".equals(apiPrefix)) {
+            System.setProperty("management.endpoints.web.basePath", autoLoggerProperties.getPrefix());
         }
 
         return new AutoLoggerBeanPostProcessor();
@@ -46,38 +50,20 @@ public class AutoLoggerAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public AutoGroupEndpoint groupListEndpoint() {
-            return new AutoGroupEndpoint();
+        public GroupEndpoint groupEndpoint() {
+            return new GroupEndpoint();
         }
 
         @Bean
         @ConditionalOnMissingBean
-        public AutoFunEndPoint serviceEndPoint() {
-            return new AutoFunEndPoint();
+        public LoggerEndpoint loggerEndpoint() {
+            return new LoggerEndpoint();
         }
 
         @Bean
         @ConditionalOnMissingBean
-        public AddAppenderOfConsoleEndpoint addAppenderOfConsoleEndpoint() {
-            return new AddAppenderOfConsoleEndpoint();
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public AddAppenderOfFileEndpoint addAppenderOfFileEndpoint() {
-            return new AddAppenderOfFileEndpoint();
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public LoggerRootSetEndpoint loggerRootSetEndpoint() {
-            return new LoggerRootSetEndpoint();
-        }
-
-        @Bean
-        @ConditionalOnMissingBean
-        public LoggerSearchEndpoint loggerSearchEndpoint() {
-            return new LoggerSearchEndpoint();
+        public AppenderEndpoint appenderEndpoint() {
+            return new AppenderEndpoint();
         }
     }
 }

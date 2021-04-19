@@ -1,6 +1,6 @@
 package com.github.simonalong.autologger.autoconfig;
 
-import com.github.simonalong.autologger.annotation.AutoLogger;
+import com.github.simonalong.autologger.annotation.WatchLogger;
 import com.github.simonalong.autologger.log.LoggerInvoker;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -13,8 +13,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 
 /**
- * @author shizi
- * @since 2021-02-02 23:55:54
+ * @author robot
  */
 @Slf4j
 @Aspect
@@ -22,28 +21,34 @@ import java.lang.reflect.Method;
 public class AutoLoggerAop {
 
     /**
-     * 拦截方法中添加注解{@link com.github.simonalong.autologger.annotation.AutoLogger}的类和方法
+     * 拦截方法中添加注解{@link WatchLogger}的类和方法
      */
-    @Around("@annotation(com.github.simonalong.autologger.annotation.AutoLogger) || @within(com.github.simonalong.autologger.annotation.AutoLogger)")
-    public Object aroundParamFun(ProceedingJoinPoint pjp) throws Throwable {
+    @Around("@annotation(com.github.simonalong.autologger.annotation.WatchLogger) || @within(com.github.simonalong.autologger.annotation.WatchLogger)")
+    public Object aroundParamFun1(ProceedingJoinPoint pjp) throws Throwable {
         Signature sig = pjp.getSignature();
         MethodSignature methodSignature = (MethodSignature) sig;
-        Method currentMethod = pjp.getTarget().getClass().getMethod(methodSignature.getName(), methodSignature.getParameterTypes());
 
-        AutoLogger autoLogger = null;
-        if (currentMethod.getDeclaringClass().isAnnotationPresent(AutoLogger.class)) {
-            autoLogger = currentMethod.getDeclaringClass().getAnnotation(AutoLogger.class);
+        Method currentMethod;
+        try {
+            currentMethod = pjp.getTarget().getClass().getMethod(methodSignature.getName(), methodSignature.getParameterTypes());
+        } catch (NoSuchMethodException e) {
+            throw e;
         }
 
-        if (currentMethod.isAnnotationPresent(AutoLogger.class)) {
-            autoLogger = currentMethod.getAnnotation(AutoLogger.class);
+        WatchLogger watchLogger = null;
+        if (currentMethod.getDeclaringClass().isAnnotationPresent(WatchLogger.class)) {
+            watchLogger = currentMethod.getDeclaringClass().getAnnotation(WatchLogger.class);
+        }
+
+        if (currentMethod.isAnnotationPresent(WatchLogger.class)) {
+            watchLogger = currentMethod.getAnnotation(WatchLogger.class);
         }
 
         Object result;
         try {
-            if (null != autoLogger) {
-                String[] groups = autoLogger.group();
-                String logName = autoLogger.value();
+            if (null != watchLogger) {
+                String[] groups = watchLogger.group();
+                String logName = watchLogger.value();
                 if ("".equals(logName)) {
                     logName = LoggerInvoker.generateMethodName(currentMethod);
                 }

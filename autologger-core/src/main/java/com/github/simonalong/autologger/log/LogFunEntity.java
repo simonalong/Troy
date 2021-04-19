@@ -7,10 +7,7 @@ import lombok.*;
  * @since 2021-02-05 11:45:48
  */
 @AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode(of = "logFunId")
+@Data
 public class LogFunEntity {
 
     private String logFunId;

@@ -1,6 +1,6 @@
 package com.github.simonalong.sample.controller;
 
-import com.github.simonalong.autologger.annotation.AutoLogger;
+import com.github.simonalong.autologger.annotation.WatchLogger;
 import com.github.simonalong.sample.service.BusinessService;
 import com.github.simonalong.sample.vo.req.Fun1Req;
 import com.github.simonalong.sample.vo.rsp.FunRsp;
@@ -18,13 +18,13 @@ public class BusinessController {
     @Autowired
     private BusinessService businessService;
 
-    @AutoLogger(group = "insert")
+    @WatchLogger(group = "insert")
     @PostMapping("autoLoggerTest")
     public FunRsp autoLogTest(@RequestBody Fun1Req fun1Req) {
         return businessService.autoLogTest(fun1Req);
     }
 
-    @AutoLogger
+    @WatchLogger
     @GetMapping("addAppender/{parameter}")
     public String debugTest(@PathVariable("parameter") String parameter) {
         return businessService.debugTest(parameter);
