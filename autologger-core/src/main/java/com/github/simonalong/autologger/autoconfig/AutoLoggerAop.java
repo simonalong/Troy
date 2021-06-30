@@ -48,10 +48,7 @@ public class AutoLoggerAop {
         try {
             if (null != watchLogger) {
                 String[] groups = watchLogger.group();
-                String logName = watchLogger.value();
-                if ("".equals(logName)) {
-                    logName = LoggerInvoker.generateMethodName(currentMethod);
-                }
+                String logName = LoggerInvoker.generateMethodName(currentMethod);
 
                 if (LoggerInvoker.enableLogger(groups, logName)) {
                     result = pjp.proceed();

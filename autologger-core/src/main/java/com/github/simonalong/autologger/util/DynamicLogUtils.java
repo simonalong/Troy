@@ -68,6 +68,20 @@ public class DynamicLogUtils {
         return 1;
     }
 
+    public Integer setLevelOfLogger(String loggerName, String logLevel) {
+        if (null == logLevel || "".equals(logLevel) || !logLevelSet.contains(logLevel.toUpperCase())) {
+            return 0;
+        }
+        LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+        ch.qos.logback.classic.Logger logger = loggerContext.getLogger(loggerName);
+        if (null != logger) {
+            logger.setLevel(Level.toLevel(logLevel));
+            logger.setAdditive(false);
+            return 1;
+        }
+        return 0;
+    }
+
     /**
      * 获取所有的logger列表
      *
@@ -76,7 +90,7 @@ public class DynamicLogUtils {
      */
     public List<Logger> getLoggerList(String loggerNamePre) {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        return loggerContext.getLoggerList().stream().filter(logger -> logger.getName().startsWith(loggerNamePre)).collect(Collectors.toList());
+        return loggerContext.getLoggerList().stream().filter(logger -> logger.getName().toLowerCase().contains(loggerNamePre.toLowerCase())).collect(Collectors.toList());
     }
 
     public List<Logger> getAllLoggerList() {
@@ -106,6 +120,9 @@ public class DynamicLogUtils {
         if (null == logger) {
             return 0;
         }
+
+        // 添加之前先删除
+        deleteAppenderOfConsole(loggerName);
 
         // 设置不继承上层日志级别
         logger.setAdditive(false);
@@ -177,6 +194,9 @@ public class DynamicLogUtils {
         if (null == logger) {
             return 0;
         }
+
+        // 添加之前先删除
+        deleteAppenderOfFile(loggerName);
 
         // 设置不继承上层日志级别
         logger.setAdditive(false);

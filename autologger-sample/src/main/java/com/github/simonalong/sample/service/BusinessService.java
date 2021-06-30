@@ -23,8 +23,21 @@ public class BusinessService {
         return rsp;
     }
 
+    @WatchLogger(group = "insert2")
+    public FunRsp autoLogTest2(Fun1Req fun1Req) {
+        FunRsp rsp = new FunRsp();
+        rsp.setAge(fun1Req.getAge());
+        rsp.setName("ok");
+        return rsp;
+    }
+
     public String debugTest(String name) {
         log.debug("ok,test, {}", name);
+        return "getResult";
+    }
+
+    public String debugTest2(String name) {
+        log.debug("ok,test2, {}", name);
         return "getResult";
     }
 }

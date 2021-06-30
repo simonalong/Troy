@@ -10,11 +10,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Getter
 @Setter
-@ConfigurationProperties("log.auto-logger")
+@ConfigurationProperties("auto.logger")
 public class AutoLoggerProperties {
 
     /**
      * api前缀，比如：/api/test/actuator
      */
     private String prefix;
+    /**
+     * 是否启用：true：启用，false：禁用
+     */
+    private Boolean enable;
 }

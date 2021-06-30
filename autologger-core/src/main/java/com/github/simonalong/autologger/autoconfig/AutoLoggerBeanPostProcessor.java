@@ -46,11 +46,7 @@ public class AutoLoggerBeanPostProcessor implements BeanPostProcessor {
                     continue;
                 }
 
-                if ("".equals(methodLogger.value())) {
-                    LoggerInvoker.put(methodLogger.group(), LoggerInvoker.generateMethodName(declaredMethod));
-                } else {
-                    LoggerInvoker.put(methodLogger.group(), methodLogger.value());
-                }
+                LoggerInvoker.put(methodLogger.group(), declaredMethod.getDeclaringClass().getCanonicalName(), LoggerInvoker.generateMethodName(declaredMethod));
             }
         } catch (Exception e) {
             e.printStackTrace();

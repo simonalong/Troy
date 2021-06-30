@@ -10,12 +10,20 @@ import org.springframework.boot.logging.LogLevel;
 @Data
 public class FunLoggerBeanWrapper {
 
+    /**
+     * 函数的全限定名，比如：com.github.simonalong.sample.controller.BusinessController#autoLogTest(com.github.simonalong.sample.vo.req.Fun1Req)
+     */
     private String logFunName;
+    /**
+     * 函数所在的loggerName，这里默认用函数的类名，比如：com.github.simonalong.sample.controller.BusinessController
+     */
+    private String loggerName;
     private LogLevel logLevel = LogLevel.INFO;
     private Boolean loggerEnable = false;
 
-    public FunLoggerBeanWrapper(String logFunName) {
+    public FunLoggerBeanWrapper(String className, String logFunName) {
         this.logFunName = logFunName;
+        this.loggerName = className;
     }
 
     public Boolean openLogger() {

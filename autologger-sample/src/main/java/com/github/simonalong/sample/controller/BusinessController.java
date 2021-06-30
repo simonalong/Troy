@@ -24,9 +24,19 @@ public class BusinessController {
         return businessService.autoLogTest(fun1Req);
     }
 
-    @WatchLogger
+    @WatchLogger(group = "insert2")
+    @PostMapping("autoLoggerTest2")
+    public FunRsp autoLogTest2(@RequestBody Fun1Req fun1Req) {
+        return businessService.autoLogTest2(fun1Req);
+    }
+
     @GetMapping("addAppender/{parameter}")
     public String debugTest(@PathVariable("parameter") String parameter) {
         return businessService.debugTest(parameter);
+    }
+
+    @GetMapping("addAppender2/{parameter}")
+    public String debugTest2(@PathVariable("parameter") String parameter) {
+        return businessService.debugTest2(parameter);
     }
 }

@@ -11,21 +11,9 @@ public interface AutoLoggerConstants {
      */
     String AUTO_LOG_PRE = "[autologger] ";
     /**
-     * 默认的服务地址
+     * 默认组
      */
-    String DEFAULT_ADDRESS = "http://isc-pivot-platform:31107";
-    /**
-     * 服务健康检查
-     */
-    String API_SYSTEM_STATUS = "/api/core/platform/system/status";
-    /**
-     * 服务不可用，日志打印门限（即多少次打印一次）
-     */
-    Integer HEARD_BEAN_PRINT_THRESHOLD = 5;
-    /**
-     * 服务端可用标示
-     */
-    String SERVER_AVAILABLE = "server_available";
+    String DEFAULT_GROUP = "_default_";
 
     /**
      * 分组

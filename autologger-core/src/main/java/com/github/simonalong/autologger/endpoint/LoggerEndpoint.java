@@ -8,10 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.simonalong.autologger.log.AppenderEntity;
 import com.github.simonalong.autologger.log.LoggerAllRspEntity;
 import com.github.simonalong.autologger.util.DynamicLogUtils;
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-import org.springframework.boot.actuate.endpoint.annotation.Selector;
-import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
+import org.springframework.boot.actuate.endpoint.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,12 +27,11 @@ public class LoggerEndpoint {
     /**
      * 获取所有的logger信息
      *
-     *
      * @return 所有的logger信息
      */
     @ReadOperation
     public List<LoggerAllRspEntity> getAllLoggerList() {
-        return DynamicLogUtils.getAllLoggerList().stream().filter(e -> e.getName().startsWith("com.isyscore") || e.getName().equals("ROOT")).map(this::loggerToEntity).collect(Collectors.toList());
+        return DynamicLogUtils.getAllLoggerList().stream().filter(e -> e.getName().equals("ROOT")).map(this::loggerToEntity).collect(Collectors.toList());
     }
 
     /**
@@ -71,6 +67,42 @@ public class LoggerEndpoint {
         return DynamicLogUtils.setLevelOfRoot(logLevel);
     }
 
+    /**
+     * 将logger级别变更
+     *
+     * @param arg0 name
+     * @param logLevel 日志级别
+     * @return 操作结果：0-没有修改，1-修改完成
+     */
+    @WriteOperation
+    public Integer updateLevelOfOne(@Selector String arg0, String loggerName, String logLevel) {
+        return DynamicLogUtils.setLevelOfLogger(loggerName, logLevel);
+    }
+
+    /**
+     * 将logger级别变更并打印
+     *
+     * @param arg0 name
+     * @param arg1 console、file或者all
+     * @param logLevel 日志级别
+     * @return 操作结果：0-没有修改，1-修改完成
+     */
+    @WriteOperation
+    public Integer updateLevelOfOneAndPrint(@Selector String arg0, @Selector String arg1, String loggerName, String logLevel) {
+        DynamicLogUtils.setLevelOfLogger(loggerName, logLevel);
+
+        if ("console".equals(arg1)) {
+            return DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
+        } else if ("file".equals(arg1)) {
+            return DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
+        } else if ("all".equals(arg1)) {
+            DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
+            return DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
+        } else {
+            return 0;
+        }
+    }
+
     private LoggerAllRspEntity loggerToEntity(Logger logger) {
         LoggerAllRspEntity rspEntity = new LoggerAllRspEntity();
 
@@ -104,5 +136,4 @@ public class LoggerEndpoint {
         }
         return appenderList;
     }
-
 }

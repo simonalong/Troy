@@ -3,10 +3,8 @@ package com.github.simonalong.autologger.endpoint;
 import com.github.simonalong.autologger.log.FunLoggerBeanWrapper;
 import com.github.simonalong.autologger.log.LoggerBeanWrapperRsp;
 import com.github.simonalong.autologger.log.LoggerInvoker;
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-import org.springframework.boot.actuate.endpoint.annotation.Selector;
-import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
+import com.github.simonalong.autologger.util.DynamicLogUtils;
+import org.springframework.boot.actuate.endpoint.annotation.*;
 
 import java.util.Map;
 import java.util.Set;
@@ -66,12 +64,12 @@ public class GroupEndpoint {
      * @param arg2     one
      * @param arg3     logger
      * @param group    分组
-     * @param funId 函数id
+     * @param logFunId 函数id
      * @return 日志信息
      */
     @ReadOperation
-    public LoggerBeanWrapperRsp getLoggerInfo(@Selector String arg0, @Selector String arg1, @Selector String arg2, @Selector String arg3, String group, String funId) {
-        return LoggerInvoker.getLoggerInfo(group, funId);
+    public LoggerBeanWrapperRsp getLoggerInfo(@Selector String arg0, @Selector String arg1, @Selector String arg2, @Selector String arg3, String group, String logFunId) {
+        return LoggerInvoker.getLoggerInfo(group, logFunId);
     }
 
     /**
@@ -88,17 +86,77 @@ public class GroupEndpoint {
     }
 
     /**
+     * 更新组的所有日志级别并输出
+     *
+     * @param arg0 console、file或者all
+     * @param group    分组
+     * @param logLevel 日志
+     * @param enable   激活与否
+     * @return 更改结果：0-没有变更，n-变更个数
+     */
+    @WriteOperation
+    public Integer updateGroupAllLoggerAndPrint(@Selector String arg0, String group, String logLevel, Boolean enable) {
+        LoggerInvoker.updateLoggerBeanLog(group, logLevel, enable);
+
+        String loggerName = "com.github.simonalong.autologger.log.LoggerInvoker";
+
+        // 设置logger的日志级别
+        DynamicLogUtils.setLevelOfLogger(loggerName, logLevel);
+
+        if ("console".equals(arg0)) {
+            return DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
+        } else if ("file".equals(arg0)) {
+            return DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
+        } else if ("all".equals(arg0)) {
+            DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
+            return DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
+        }
+        return 0;
+    }
+
+    /**
      * 更新对应函数日志级别
      *
      * @param arg0 fun
-     * @param group 分组
+     * @param arg1 change
      * @param funId 函数id
      * @param logLevel 日志级别
      * @param enable 激活与否
      * @return 更新结果标示：0-没有更新成功，1-更新成功
      */
     @WriteOperation
-    public Integer updateFunLogger(@Selector String arg0, String group, String funId, String logLevel, Boolean enable) {
-        return LoggerInvoker.updateLoggerBeanLog(group, funId, logLevel, enable);
+    public Integer updateFunLogger(@Selector String arg0, @Selector String arg1, String funId, String logLevel, Boolean enable) {
+        return LoggerInvoker.updateLoggerBeanLogOfFunId(funId, logLevel, enable);
+    }
+
+    /**
+     * 更新对应函数日志级别并输出
+     *
+     * @param arg0 fun
+     * @param arg1 print
+     * @param arg2 console、file或者all
+     * @param funId 函数id
+     * @param logLevel 日志级别
+     * @param enable 激活与否
+     * @return 更新结果标示：0-没有更新成功，1-更新成功
+     */
+    @WriteOperation
+    public Integer updateFunLoggerAndPrint(@Selector String arg0, @Selector String arg1, @Selector String arg2, String funId, String logLevel, Boolean enable) {
+        LoggerInvoker.updateLoggerBeanLogOfFunId(funId, logLevel, enable);
+
+        String loggerName = "com.github.simonalong.autologger.log.LoggerInvoker";
+
+        // 设置logger的日志级别
+        DynamicLogUtils.setLevelOfLogger(loggerName, logLevel);
+
+        if ("console".equals(arg2)) {
+            return DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
+        } else if ("file".equals(arg2)) {
+            return DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
+        } else if ("all".equals(arg2)) {
+            DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
+            return DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
+        }
+        return 0;
     }
 }
