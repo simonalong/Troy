@@ -1,204 +1,302 @@
 ## WatchLogger
 自动化管理在线日志框架
 
-### 背景
+# 背景
 在工作中遇到这么两个问题，然后根据对应问题编写了这么一个框架
 1. 线上日志为info级别，但是我想看我的那块debug代码打印的日志，不想重启代码怎么办？
 2. 线上出现问题不好排查，想查看某个函数的出入参，不想重启代码怎么办？
 
-对于以上两个问题，该框架提供了对应的方案
-
-## 解决问题1：自动打印函数出入参
-要动态实现日志打印，这里需要使用一个注解`@WatchLogger`，修饰类和函数
-```java
-@Slf4j
-@WatchLogger(group = {"fun1", "test"})
-@Service
-public class BusinessService {
-    // ...
-}
+对于以上两个问题，该框架提供了对应的方案，其中日志框架底层采用的是logback
+# jar包引入
+```xml
+<dependency>
+    <groupId>com.github.simonalong</groupId>
+    <artifactId>autologger-core</artifactId>
+    <version>1.0.0</version>
+</dependency>
 ```
-修饰函数，则函数会覆盖类的注解
-```java
-@Slf4j
-@Service
-public class XxxService {
 
-    // ...
+配置使用
+可以不配置，都有默认值
+```yaml
+auto:
+  logger:
+    # api前缀。默认为：/api/auto/logger/actuator
+    prefix: /api/auto/logger/actuator
+    # 是否启用。默认启用
+    enable: true
+```
+
+对于该框架有如下几种用法
+## 一、分组使用
+这里对代码有侵入，提供注解`@WatchLogger`，修饰类和函数，函数会覆盖类的使用。
+
+#### 使用场景：
+对于一些平常不需要打印日志，但是在定位问题时候，就需要知道某个函数的出入参这种，就可以使用
+
+```java
+@WatchLogger(group = "business")
+@RequestMapping("api/sample/biz")
+@RestController
+public class BusinessController {
+
+    @Autowired
+    private BusinessService businessService;
+
     @WatchLogger(group = "insert")
-    public FunRsp autoLogTest(Fun1Req fun1Req) {
-        FunRsp rsp = new FunRsp();
-        rsp.setAge(fun1Req.getAge());
-        rsp.setName("ok");
-        return rsp;
+    @PostMapping("autoLoggerTest")
+    public FunRsp autoLogTest(@RequestBody Fun1Req fun1Req) {
+        return businessService.autoLogTest(fun1Req);
     }
+    // ... 省略更多 ...
 }
 ```
+提示：修饰函数，则函数会覆盖类的注解
 
+### 所有分组列表
+> curl http://localhost:port/api/auto/logger/actuator/group/list
 
-### 查看分组列表
-> http://localhost:8080${log.auto-logger.prefix:/actuator}/group/list
+输出：
+```json
+[
+    "business",
+    "insert"
+]
+```
 
 提示：
-其中 log.auto-logger.prefix 是可以在application.yml中进行配置，如果没有配置，则默认为/actuator
+其中host和port都是自己业务的，以下都一样
 
-输出：
-> ["default","fun1","test","insert"]
-
-### 查看分组下所有函数
->http://yourService:port${log.auto-logger.prefix:/actuator}/group/fun/list?group={xxx}
+### 分组下的所有函数
+> curl http://localhost:port/api/auto/logger/actuator/group/fun/list?group={group}
 
 输出：
 ```json
 [
-  "fun: 13bc77397a3f9a769f3891663ded56ad9e95d556bb2dd1fc27b8d9745111dcd4 = com.github.simonalong.sample.service.BusinessService#debugTest(java.lang.String)",
-  "fun: uosdfnwesdfasdfiwuejskkjdfoijaiudoifnasdiufoandfkaiusd9fjjfosiud = com.github.simonalong.sample.service.BusinessService#debugTest2(java.lang.String)"
+    "fun: d6290cf8bd8a0c8ac01c4531374e77462ff5d5838c4ff3b1689c76bc41e33b4a = com.github.simonalong.sample.controller.BusinessController#autoLogTest(com.github.simonalong.sample.vo.req.Fun1Req)",
+    "fun: 53cb4ea3745bdb87bc3e8dcd915e98ed4e1128965ce0e3b1dd5d48fc7b05fa59 = com.github.simonalong.sample.service.BusinessService#autoLogTest(com.github.simonalong.sample.vo.req.Fun1Req)"
 ]
 ```
 
-### 查看分组所有函数详细信息
->http://yourService:port${log.auto-logger.prefix:/actuator}/group/fun/info/all?group={xxx}
+提示：
+其中前面是funId，后面是对应的函数展示
+
+### 分组全部信息
+> curl http://localhost:port/api/auto/logger/actuator/group/fun/info/all?group={group}
 
 输出：
 ```json
 {
-  "13bc77397a3f9a769f3891663ded56ad9e95d556bb2dd1fc27b8d9745111dcd4": {
-    "logFunName": "com.github.simonalong.sample.service.BusinessService#debugTest(java.lang.String)",
+    "d6290cf8bd8a0c8ac01c4531374e77462ff5d5838c4ff3b1689c76bc41e33b4a": {
+        "logFunName": "com.github.simonalong.sample.controller.BusinessController#autoLogTest(com.github.simonalong.sample.vo.req.Fun1Req)",
+        "loggerName": "com.github.simonalong.sample.controller.BusinessController",
+        "logLevel": "INFO",
+        "loggerEnable": false
+    },
+    "53cb4ea3745bdb87bc3e8dcd915e98ed4e1128965ce0e3b1dd5d48fc7b05fa59": {
+        "logFunName": "com.github.simonalong.sample.service.BusinessService#autoLogTest(com.github.simonalong.sample.vo.req.Fun1Req)",
+        "loggerName": "com.github.simonalong.sample.service.BusinessService",
+        "logLevel": "INFO",
+        "loggerEnable": false
+    }
+}
+```
+
+### 分组函数信息
+> curl http://localhost:port/api/auto/logger/actuator/group/fun/info/one/logger?group={group}&logFunId={funId}
+
+输出：
+```json
+{
+    "logFunName": "com.isyscore.os.sample.controller.BusinessController#autoLogTest(com.isyscore.os.sample.vo.req.Fun1Req)",
     "logLevel": "INFO",
     "loggerEnable": false
-  },
-  "uosdfnwesdfasdfiwuejskkjdfoijaiudoifnasdiufoandfkaiusd9fjjfosiud": {
-    "logFunName": "com.github.simonalong.sample.service.BusinessService#debugTest(java.lang.String)",
-    "logLevel": "DEBUG",
-    "loggerEnable": false
-  }
 }
 ```
 
-### 查看函数具体信息
->http://yourService:port${log.auto-logger.prefix:/actuator}/group/fun/info/one/logger?group={group}&funId={funId}
+### 全组更新
+将分组的所有的函数的日志信息更新
+> curl -X POST http://localhost:port/api/auto/logger/actuator/group?group={group}&logLevel={logLevel}&enable={enable}
+
+输出（个数）：
+n
+
+### 全组更新并输出到控制台
+将分组的所有函数日志信息更新，并添加控制台的appender，输出到控制台
+> curl -X POST http://localhost:port/api/auto/logger/actuator/group/console?group={group}&logLevel={logLevel}&enable={enable}
+
+输出（个数）：
+n
+
+### 全组更新并输出到文件
+将分组的所有函数日志信息更新，并添加文件的appender，输出到文件
+> curl -X POST http://localhost:port/api/auto/logger/actuator/group/file?group={group}&logLevel={logLevel}&enable={enable}
+
+输出（个数）：
+n
+
+### 全组更新并输出
+将分组的所有函数日志信息更新，并添加控制台和文件的appender，输出到控制台和文件
+> curl -X POST http://localhost:port/api/auto/logger/actuator/group/all?group={group}&logLevel={logLevel}&enable={enable}
+
+输出（个数）：
+n
+
+---
+
+### 分组内函数更新
+将分组内的某个函数的日志信息更新
+> curl -X POST http://localhost:port/api/auto/logger/actuator/group/fun/change?funId={funId}&logLevel={logLevel}&enable={enable}
+
+输出（个数）：
+n
+
+### 分组内函数更新并输出到控制台
+将分组的所有函数日志信息更新，并添加控制台的appender，输出到控制台
+> curl -X POST http://localhost:port/api/auto/logger/actuator/group/fun/print/console?group={group}&logLevel={logLevel}&enable={enable}
+
+输出（个数）：
+n
+
+### 分组内函数更新并输出到文件
+将分组的所有函数日志信息更新，并添加文件的appender，输出到文件
+> curl -X POST http://localhost:port/api/auto/logger/actuator/group/fun/print/file?group={group}&logLevel={logLevel}&enable={enable}
+
+输出（个数）：
+n
+
+### 分组内函数更新并输出
+将分组的所有函数日志信息更新，并添加控制台和文件的appender，输出到控制台和文件
+> curl -X POST http://localhost:port/api/auto/logger/actuator/group/fun/print/all?group={group}&logLevel={logLevel}&enable={enable}
+
+输出（个数）：
+n
+
+
+## logger（日志记录器）
+
+### 查看所有logger
+> curl http://localhost:port/api/auto/logger/actuator/logger
 
 输出：
 ```json
-{
-  "logFunName": "com.github.simonalong.sample.service.BusinessService#debugTest(java.lang.String)",
-  "logLevel": "INFO",
-  "loggerEnable": false
-}
-```
-说明：
-其中xxxx=yyy，xxx表示函数对应的唯一标识（funId），yyy表示对应的函数
-
-### 更新分组的级别
->http://yourService:port${log.auto-logger.prefix:/actuator}/group?group={group}&logLevel={level}&enable={enable}' -H 'Content-Type: application/json' 
-
-##### 输出：
-> 1/0
-
-
-### 更新函数的级别
->http://yourService:port${log.auto-logger.prefix:/actuator}/group/fun?group={group}&funId={funId}&logLevel={level}&enable={enable}' -H 'Content-Type: application/json'
-
-##### 说明：
-
-- group：分组
-- funId：为上面的一长串，比如 436b1181267238e5958a8be0c1701ebe691ebf8c0038ea1b9179bd34de74fddc
-- logLevel：日志级别，trace/debug/info/warn/error，大小写均可，数字也可以，
-    - 0：trace
-    - 1：debug
-    - 2：info
-    - 3：warn
-    - 4：error
-- enable：开启和关闭自动日志，true和false
-##### 输出：
-> 1/0
-
-输出0，表示没有变更，1表示变更成功
-
-
-### 日志中的打印
-打开自动化日志后，业务运行到某个函数，会自动打印
-```text
-[auto-logger] 结果：{"response":{"age":12,"name":"ok"},"parameters":[{"age":12,"name":"test"}],"fun":"public com.xxx.controller1.FunRsp com.xxx.controller1.TestController.postFun(com.xxx.controller1.Fun1Req)"}
-```
-```json
-{
-  "response":{
-    "age":12,
-    "name":"ok"
-  },
-  "parameters":[
+[
     {
-      "age":12,
-      "name":"test"
+        "loggerName": "ROOT",
+        "logLevelStr": "INFO",
+        "appenderList": [
+            {
+                "appenderName": "STDOUT",
+                "appenderPattern": "%yellow(%d{yyyy-MM-dd HH:mm:ss.SSS}) %black(shizi-2.local) %highlight(%p) --- %cyan([autologger-sample]) %yellow([%X{traceId}]) %black(%c) %black(%M) %black([%t@42976]) : %green(%m%n)"
+            }
+//       ... 更多 ...
+        ]
     }
-  ],
-  "fun":"public com.xxx.controller1.FunRsp com.xxx.controller1.TestController.postFun(com.xxx.controller1.Fun1Req)"
-}
+]
 ```
-目前打印三个字段：
-parameters：函数的入参
-response：函数的出参
-fun：函数全限定名
 
-## 解决问题2：info级别下打印debug日志
-直接操作即可
-### 查看root级别
->http://yourService:port${log.auto-logger.prefix:/actuator}/logger/root
+### 查看root的日志级别
+> curl http://localhost:port/api/auto/logger/actuator/logger/root
 
-输出（举例）：
-INFO
+输出（DEBUG、INFO、WARN...）：
+DEBUG
 
-### 查看logger
->http://yourService:port${log.auto-logger.prefix:/actuator}/logger
+### logger查找
+模糊匹配匹配到的logger
+> curl http://localhost:port/api/auto/logger/actuator/logger/search/list?loggerName={loggerName}
 
 输出：
 ```json
 [
-  {
-    "loggerName": "ROOT",
-    "logLevelStr": "INFO",
-    "appenderList": [
-      {
-        "appenderName": "CONSOLE",
-        "appenderPattern": "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(98826){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n%wEx"
-      }
-    ]
-  }
+    {
+        "loggerName": "com.isyscore.os.sample.service.BusinessService",
+        "logLevelStr": "INFO",
+        "appenderList": []
+    }
 ]
 ```
 
-### 修改root级别
->curl -X POST http://yourService:port${log.auto-logger.prefix:/actuator}/logger?logLevel={logLevel}
+### 变更root日志级别
+> curl -X POST http://localhost:port/api/auto/logger/actuator/logger/actuator/logger?logLevel={logLevel}
 
-结果（成功/失败）：
-0/1
+输出（个数）：
+n
 
-### logger搜索
-根据logger名字（代码中默认为类的全名，比如com.xxx）的前缀进行搜索
-> curl http://yourService:port${log.auto-logger.prefix:/actuator}/logger/search/list?loggerName={loggerName}
+### 变更某个logger日志级别
+> curl -X POST http://localhost:port/api/auto/logger/actuator/logger/name?loggerName={loggerName}&logLevel={logLevel}
 
-结果，示例：
-```json
-[
-  {
-    "loggerName": "com",
-    "logLevelStr": "INFO",
-    "appenderList": []
-  },
-  {
-    "loggerName": "com.github",
-    "logLevelStr": "INFO",
-    "appenderList": []
-  }
-]
-```
+输出（个数）：
+n
 
-### 添加appender到控制台
->curl -X POST http://yourService:port${log.auto-logger.prefix:/actuator}/appender/console/{logName}/{logLevel}  -H 'Content-Type: application/json'
+### 变更某个logger并输出到控制台
+> curl -X POST http://localhost:port/api/auto/logger/actuator/logger/name/console?loggerName={loggerName}&logLevel={logLevel}
 
-### 添加appender到文件
->curl -X POST http://yourService:port${log.auto-logger.prefix:/actuator}/appender/file/{logName}/{logLevel}  -H 'Content-Type: application/json'
+输出（个数）：
+n
 
-### 删除appender到控制台
->curl -X DELETE http://yourService:port${log.auto-logger.prefix:/actuator}/appender/{logName}
+### 变更某个logger并输出到文件
+> curl -X POST http://localhost:port/api/auto/logger/actuator/logger/name/file?loggerName={loggerName}&logLevel={logLevel}
+
+输出（个数）：
+n
+
+### 变更某个logger并输出
+变更并输出到文件和控制台
+> curl -X POST http://localhost:port/api/auto/logger/actuator/logger/name/all?loggerName={loggerName}&logLevel={logLevel}
+
+输出（个数）：
+n
+
+
+## 日志输出器（appender）
+该appender主要就是用于将日志搜集之后如何处理使用的
+
+### 添加自定义控制台输出器
+添加某个logger的appender到控制台
+> curl -X POST http://localhost:port/api/auto/logger/actuator/appender/console?loggerName={loggerName}&logLevel={logLevel}
+
+输出（个数）：
+n
+
+### 添加自定义文件输出器
+添加某个logger的appender到文件
+> curl -X POST http://localhost:port/api/auto/logger/actuator/appender/file?loggerName={loggerName}&logLevel={logLevel}
+
+输出（个数）：
+n
+
+
+### 添加自定义控制台和文件输出器
+添加某个logger的appender到文件也到控制台
+> curl -X POST http://localhost:port/api/auto/logger/actuator/appender/all?loggerName={loggerName}&logLevel={logLevel}
+
+输出（个数）：
+n
+
+---
+
+### 删除某个appender
+> curl -X DELETE http://localhost:port/api/auto/logger/actuator/appender?loggerName={LoggerName}
+
+输出（个数）：
+n
+
+### 删除自定义文件输出器
+> curl -X DELETE http://localhost:port/api/auto/logger/actuator/appender/file?loggerName={LoggerName}
+
+输出（个数）：
+n
+
+### 删除自定义控制台输出器
+> curl -X DELETE http://localhost:port/api/auto/logger/actuator/appender/console?loggerName={LoggerName}
+
+输出（个数）：
+n
+
+### 删除自定义输出器
+这里会删除文件也会删除控制台
+> curl -X DELETE http://localhost:port/api/auto/logger/actuator/appender/all?loggerName={LoggerName}
+
+输出（个数）：
+n
+
