@@ -1,5 +1,5 @@
-## WatchLogger
-自动化管理在线日志框架
+## Troy
+日志在线管理框架，叫特洛伊，有点在暗处操控的意味
 
 # 背景
 在工作中遇到这么两个问题，然后根据对应问题编写了这么一个框架
@@ -11,7 +11,7 @@
 ```xml
 <dependency>
     <groupId>com.github.simonalong</groupId>
-    <artifactId>autologger-core</artifactId>
+    <artifactId>troy</artifactId>
     <version>1.0.0</version>
 </dependency>
 ```
@@ -19,10 +19,10 @@
 配置使用
 可以不配置，都有默认值
 ```yaml
-auto:
+troy:
   logger:
-    # api前缀。默认为：/api/auto/logger/actuator
-    prefix: /api/auto/logger/actuator
+    # api前缀。默认为：/api/troy/logger/actuator
+    prefix: /api/troy/logger/actuator
     # 是否启用。默认启用
     enable: true
 ```
@@ -44,9 +44,9 @@ public class BusinessController {
     private BusinessService businessService;
 
     @WatchLogger(group = "insert")
-    @PostMapping("autoLoggerTest")
-    public FunRsp autoLogTest(@RequestBody Fun1Req fun1Req) {
-        return businessService.autoLogTest(fun1Req);
+    @PostMapping("troyTest")
+    public FunRsp troyTest(@RequestBody Fun1Req fun1Req) {
+        return businessService.troyTest(fun1Req);
     }
     // ... 省略更多 ...
 }
@@ -73,8 +73,8 @@ public class BusinessController {
 输出：
 ```json
 [
-    "fun: d6290cf8bd8a0c8ac01c4531374e77462ff5d5838c4ff3b1689c76bc41e33b4a = com.github.simonalong.sample.controller.BusinessController#autoLogTest(com.github.simonalong.sample.vo.req.Fun1Req)",
-    "fun: 53cb4ea3745bdb87bc3e8dcd915e98ed4e1128965ce0e3b1dd5d48fc7b05fa59 = com.github.simonalong.sample.service.BusinessService#autoLogTest(com.github.simonalong.sample.vo.req.Fun1Req)"
+    "fun: d6290cf8bd8a0c8ac01c4531374e77462ff5d5838c4ff3b1689c76bc41e33b4a = com.github.simonalong.sample.controller.BusinessController#troyTest(com.github.simonalong.sample.vo.req.Fun1Req)",
+    "fun: 53cb4ea3745bdb87bc3e8dcd915e98ed4e1128965ce0e3b1dd5d48fc7b05fa59 = com.github.simonalong.sample.service.BusinessService#troyTest(com.github.simonalong.sample.vo.req.Fun1Req)"
 ]
 ```
 
@@ -88,13 +88,13 @@ public class BusinessController {
 ```json
 {
     "d6290cf8bd8a0c8ac01c4531374e77462ff5d5838c4ff3b1689c76bc41e33b4a": {
-        "logFunName": "com.github.simonalong.sample.controller.BusinessController#autoLogTest(com.github.simonalong.sample.vo.req.Fun1Req)",
+        "logFunName": "com.github.simonalong.sample.controller.BusinessController#troyTest(com.github.simonalong.sample.vo.req.Fun1Req)",
         "loggerName": "com.github.simonalong.sample.controller.BusinessController",
         "logLevel": "INFO",
         "loggerEnable": false
     },
     "53cb4ea3745bdb87bc3e8dcd915e98ed4e1128965ce0e3b1dd5d48fc7b05fa59": {
-        "logFunName": "com.github.simonalong.sample.service.BusinessService#autoLogTest(com.github.simonalong.sample.vo.req.Fun1Req)",
+        "logFunName": "com.github.simonalong.sample.service.BusinessService#troyTest(com.github.simonalong.sample.vo.req.Fun1Req)",
         "loggerName": "com.github.simonalong.sample.service.BusinessService",
         "logLevel": "INFO",
         "loggerEnable": false
@@ -108,7 +108,7 @@ public class BusinessController {
 输出：
 ```json
 {
-    "logFunName": "com.isyscore.os.sample.controller.BusinessController#autoLogTest(com.isyscore.os.sample.vo.req.Fun1Req)",
+    "logFunName": "com.isyscore.os.sample.controller.BusinessController#troyTest(com.isyscore.os.sample.vo.req.Fun1Req)",
     "logLevel": "INFO",
     "loggerEnable": false
 }
@@ -187,7 +187,7 @@ n
         "appenderList": [
             {
                 "appenderName": "STDOUT",
-                "appenderPattern": "%yellow(%d{yyyy-MM-dd HH:mm:ss.SSS}) %black(shizi-2.local) %highlight(%p) --- %cyan([autologger-sample]) %yellow([%X{traceId}]) %black(%c) %black(%M) %black([%t@42976]) : %green(%m%n)"
+                "appenderPattern": "%yellow(%d{yyyy-MM-dd HH:mm:ss.SSS}) %black(shizi-2.local) %highlight(%p) --- %cyan([troy-sample]) %yellow([%X{traceId}]) %black(%c) %black(%M) %black([%t@42976]) : %green(%m%n)"
             }
 //       ... 更多 ...
         ]

@@ -1,3 +1,0 @@
-# AutoConfiguration
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.github.simonalong.autologger.autoconfig.AutoLoggerAutoConfiguration
