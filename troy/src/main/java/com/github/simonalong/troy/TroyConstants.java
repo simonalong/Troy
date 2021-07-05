@@ -28,6 +28,10 @@ public interface TroyConstants {
      */
     String APPENDER = "appender";
     /**
+     * 功能api列表
+     */
+    String API = "api";
+    /**
      * 默认的api前缀
      */
     String DEFAULT_API_PREFIX = "/api/troy/log/actuator";
