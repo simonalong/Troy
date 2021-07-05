@@ -30,8 +30,7 @@ public class LoggerInvoker {
      * 日志映射管理map，key为group, value为map： key为logName实体（如果logName为空，则为函数的类全限定名加上#，再加上函数名）, value为bean的日志包装类
      */
     @Getter
-    private final Map<String, Map<String, com.github.simonalong.troy.log.FunLoggerBeanWrapper>> loggerProxyMap = new HashMap<>();
-    private final Map<String, com.github.simonalong.troy.log.FunLoggerBeanWrapper> funProxyMap = new HashMap<>();
+    private final Map<String, Map<String, FunLoggerBeanWrapper>> loggerProxyMap = new HashMap<>();
     private final Map<String, LogLevel> logLevelNameMap;
 
     static {
@@ -40,13 +39,13 @@ public class LoggerInvoker {
 
     public void put(String[] groups, String className, String logFunName) {
         String hashKey = EncryptUtil.SHA256(logFunName);
-        com.github.simonalong.troy.log.FunLoggerBeanWrapper beanWrapper = new com.github.simonalong.troy.log.FunLoggerBeanWrapper(className, logFunName);
+        FunLoggerBeanWrapper beanWrapper = new FunLoggerBeanWrapper(className, logFunName);
 
         List<String> groupList = new ArrayList<>(Arrays.asList(groups));
         groupList.add(DEFAULT_GROUP);
         groupList.forEach(group -> loggerProxyMap.compute(group, (k, v) -> {
             if (null == v) {
-                Map<String, com.github.simonalong.troy.log.FunLoggerBeanWrapper> loggerBeanWrapperMap = new HashMap<>();
+                Map<String, FunLoggerBeanWrapper> loggerBeanWrapperMap = new HashMap<>();
                 loggerBeanWrapperMap.put(hashKey, beanWrapper);
                 return loggerBeanWrapperMap;
             } else {
@@ -66,12 +65,12 @@ public class LoggerInvoker {
     public Boolean enableLogger(String[] groups, String logFunName) {
         for (String group : groups) {
             if (loggerProxyMap.containsKey(group)) {
-                Map<String, com.github.simonalong.troy.log.FunLoggerBeanWrapper> beanWrapperMap = loggerProxyMap.get(group);
+                Map<String, FunLoggerBeanWrapper> beanWrapperMap = loggerProxyMap.get(group);
                 String funId = EncryptUtil.SHA256(logFunName);
                 if (!beanWrapperMap.containsKey(funId)) {
                     continue;
                 }
-                com.github.simonalong.troy.log.FunLoggerBeanWrapper beanWrapper = beanWrapperMap.get(funId);
+                FunLoggerBeanWrapper beanWrapper = beanWrapperMap.get(funId);
                 if (beanWrapper.openLogger()) {
                     return true;
                 }
@@ -92,16 +91,20 @@ public class LoggerInvoker {
         return Collections.emptySet();
     }
 
-    public LoggerBeanWrapperRsp getLoggerInfo(String group, String logFunId) {
-        if (!loggerProxyMap.containsKey(group)) {
-            return null;
+    public LoggerBeanWrapperRsp getLoggerInfo(String logFunId) {
+        FunLoggerBeanWrapper funLoggerBeanWrapper = null;
+        for (Map.Entry<String, Map<String, FunLoggerBeanWrapper>> entry : loggerProxyMap.entrySet()) {
+            Map<String, FunLoggerBeanWrapper> beanWrapperMap = entry.getValue();
+            if (beanWrapperMap.containsKey(logFunId)) {
+                funLoggerBeanWrapper = beanWrapperMap.get(logFunId);
+                break;
+            }
         }
-        Map<String, com.github.simonalong.troy.log.FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
-        if (!loggerBeanWrapperMap.containsKey(logFunId)) {
+
+        if (null == funLoggerBeanWrapper) {
             return null;
         }
 
-        com.github.simonalong.troy.log.FunLoggerBeanWrapper funLoggerBeanWrapper = loggerBeanWrapperMap.get(logFunId);
         LoggerBeanWrapperRsp wrapperRsp = new LoggerBeanWrapperRsp();
         wrapperRsp.setLogLevel(funLoggerBeanWrapper.getLogLevel());
         wrapperRsp.setLoggerEnable(funLoggerBeanWrapper.getLoggerEnable());
@@ -126,7 +129,7 @@ public class LoggerInvoker {
             return 0;
         }
 
-        Map<String, com.github.simonalong.troy.log.FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
+        Map<String, FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
         loggerBeanWrapperMap.values().forEach(funLoggerBeanWrapper ->{
             if (null != logLevel) {
                 funLoggerBeanWrapper.setLogLevel(parseLogLevel(logLevel));
@@ -151,12 +154,12 @@ public class LoggerInvoker {
             return 0;
         }
 
-        Map<String, com.github.simonalong.troy.log.FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(DEFAULT_GROUP);
+        Map<String, FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(DEFAULT_GROUP);
         if (!loggerBeanWrapperMap.containsKey(funId)) {
             return 0;
         }
 
-        com.github.simonalong.troy.log.FunLoggerBeanWrapper funLoggerBeanWrapper = loggerBeanWrapperMap.get(funId);
+        FunLoggerBeanWrapper funLoggerBeanWrapper = loggerBeanWrapperMap.get(funId);
         if (null != logLevelName) {
             funLoggerBeanWrapper.setLogLevel(parseLogLevel(logLevelName));
         }
@@ -191,13 +194,13 @@ public class LoggerInvoker {
         String logName = generateMethodName(method);
 
         for (String group : groups) {
-            Map<String, com.github.simonalong.troy.log.FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
+            Map<String, FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
             String funId = EncryptUtil.SHA256(logName);
             if (!loggerBeanWrapperMap.containsKey(funId)) {
                 continue;
             }
 
-            com.github.simonalong.troy.log.FunLoggerBeanWrapper funLoggerBeanWrapper = loggerBeanWrapperMap.get(funId);
+            FunLoggerBeanWrapper funLoggerBeanWrapper = loggerBeanWrapperMap.get(funId);
             if (!funLoggerBeanWrapper.openLogger()) {
                 return;
             }
@@ -234,13 +237,13 @@ public class LoggerInvoker {
         String logName = generateMethodName(method);
 
         for (String group : groups) {
-            Map<String, com.github.simonalong.troy.log.FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
+            Map<String, FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
             String funId = EncryptUtil.SHA256(logName);
             if (!loggerBeanWrapperMap.containsKey(funId)) {
                 continue;
             }
 
-            com.github.simonalong.troy.log.FunLoggerBeanWrapper funLoggerBeanWrapper = loggerBeanWrapperMap.get(funId);
+            FunLoggerBeanWrapper funLoggerBeanWrapper = loggerBeanWrapperMap.get(funId);
             if (!funLoggerBeanWrapper.openLogger()) {
                 return;
             }
@@ -253,7 +256,7 @@ public class LoggerInvoker {
         }
     }
 
-    private void printLog(com.github.simonalong.troy.log.FunLoggerBeanWrapper beanWrapper, TreeMap<String, Object> outInfo, Method method, Object[] args) {
+    private void printLog(FunLoggerBeanWrapper beanWrapper, TreeMap<String, Object> outInfo, Method method, Object[] args) {
         outInfo.put("fun", method.toString());
         outInfo.put("parameters", Arrays.asList(args));
 

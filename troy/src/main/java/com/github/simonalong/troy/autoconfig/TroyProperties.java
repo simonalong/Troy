@@ -10,11 +10,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Getter
 @Setter
-@ConfigurationProperties("troy.logger")
+@ConfigurationProperties("troy.log")
 public class TroyProperties {
 
     /**
-     * api前缀，比如：/api/troy/logger/actuator
+     * api前缀，比如：/api/troy/log/actuator
      */
     private String prefix;
     /**

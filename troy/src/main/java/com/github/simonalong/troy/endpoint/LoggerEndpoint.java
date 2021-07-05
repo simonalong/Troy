@@ -31,52 +31,35 @@ public class LoggerEndpoint {
      */
     @ReadOperation
     public List<LoggerAllRspEntity> getAllLoggerList() {
-        return DynamicLogUtils.getAllLoggerList().stream().filter(e -> e.getName().equals("ROOT")).map(this::loggerToEntity).collect(Collectors.toList());
+        return DynamicLogUtils.getAllLoggerList().stream().map(this::loggerToEntity).collect(Collectors.toList());
     }
 
     /**
      * 获取服务的root的日志级别
-     * @param arg0 root
+     * @param arg0 日志名
      */
     @ReadOperation
-    public String getLevelOfRoot(@Selector String arg0) {
-        return DynamicLogUtils.getLevelOfRoot();
-    }
-
-    /**
-     * 模糊匹配获取logger集合
-     *
-     * @param arg0 search
-     * @param arg1 list
-     * @param loggerName logger名字的前缀
-     * @return logger集合的json展示
-     */
-    @ReadOperation
-    public List<LoggerAllRspEntity> getLoggerListFromSearch(@Selector String arg0, @Selector String arg1, String loggerName) {
-        return DynamicLogUtils.getLoggerList(loggerName).stream().map(this::loggerToEntity).collect(Collectors.toList());
-    }
-
-    /**
-     * 将root级别变更
-     *
-     * @param logLevel 日志级别
-     * @return 操作结果：0-没有修改，1-修改完成
-     */
-    @WriteOperation
-    public Integer updateLevelOfRoot(String logLevel) {
-        return DynamicLogUtils.setLevelOfRoot(logLevel);
+    public List<LoggerAllRspEntity> getLevelInfo(@Selector String arg0) {
+        return DynamicLogUtils.getAllLoggerList().stream().filter(e->e.getName().toLowerCase().contains(arg0)).map(this::loggerToEntity).collect(Collectors.toList());
     }
 
     /**
      * 将logger级别变更
      *
-     * @param arg0 name
+     * @param loggerName 日志名
      * @param logLevel 日志级别
      * @return 操作结果：0-没有修改，1-修改完成
      */
     @WriteOperation
-    public Integer updateLevelOfOne(@Selector String arg0, String loggerName, String logLevel) {
-        return DynamicLogUtils.setLevelOfLogger(loggerName, logLevel);
+    public Integer updateLevelOfOne(String loggerName, String logLevel) {
+        if (logLevel.endsWith("\b")) {
+            logLevel = logLevel.substring(0, logLevel.length() - 1);
+        }
+        if ("root".equals(loggerName)) {
+            return DynamicLogUtils.setLevelOfRoot(logLevel);
+        } else {
+            return DynamicLogUtils.setLevelOfLogger(loggerName, logLevel);
+        }
     }
 
     /**
@@ -88,7 +71,7 @@ public class LoggerEndpoint {
      * @return 操作结果：0-没有修改，1-修改完成
      */
     @WriteOperation
-    public Integer updateLevelOfOneAndPrint(@Selector String arg0, @Selector String arg1, String loggerName, String logLevel) {
+    public Integer addLevelOfOneAndPrint(@Selector String arg0, @Selector String arg1, String loggerName, String logLevel) {
         DynamicLogUtils.setLevelOfLogger(loggerName, logLevel);
 
         if ("console".equals(arg1)) {
@@ -96,8 +79,8 @@ public class LoggerEndpoint {
         } else if ("file".equals(arg1)) {
             return DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
         } else if ("all".equals(arg1)) {
-            DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
-            return DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
+            Integer count = DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
+            return count + DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
         } else {
             return 0;
         }

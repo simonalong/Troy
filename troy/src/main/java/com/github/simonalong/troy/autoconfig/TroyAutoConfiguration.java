@@ -21,7 +21,7 @@ import static com.github.simonalong.troy.TroyConstants.*;
  */
 @Slf4j
 @EnableConfigurationProperties(TroyProperties.class)
-@ConditionalOnExpression("#{''.equals('${troy.logger.enable:}') or 'true'.equals('${troy.logger.enable}')}")
+@ConditionalOnExpression("#{''.equals('${troy.log.enable:}') or 'true'.equals('${troy.log.enable}')}")
 @Configuration
 public class TroyAutoConfiguration {
 

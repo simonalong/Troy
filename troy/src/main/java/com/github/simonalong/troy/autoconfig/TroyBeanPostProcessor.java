@@ -1,5 +1,6 @@
 package com.github.simonalong.troy.autoconfig;
 
+import com.alibaba.fastjson.parser.ParserConfig;
 import com.github.simonalong.troy.annotation.Watcher;
 import com.github.simonalong.troy.log.LoggerInvoker;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,10 @@ import java.lang.reflect.Method;
 @Component
 @Slf4j
 public class TroyBeanPostProcessor implements BeanPostProcessor {
+
+    static {
+        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+    }
 
     @Override
     @Nullable

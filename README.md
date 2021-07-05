@@ -20,22 +20,22 @@
 可以不配置，都有默认值
 ```yaml
 troy:
-  logger:
-    # api前缀。默认为：/api/troy/logger/actuator
-    prefix: /api/troy/logger/actuator
+  log:
+    # api前缀。默认为：/api/troy/log/actuator
+    prefix: /api/troy/log/actuator
     # 是否启用。默认启用
     enable: true
 ```
 
 对于该框架有如下几种用法
 ## 一、分组使用
-这里对代码有侵入，提供注解`@WatchLogger`，修饰类和函数，函数会覆盖类的使用。
+这里对代码有侵入，提供注解`@Watcher`，修饰类和函数，函数会覆盖类的使用。
 
 #### 使用场景：
 对于一些平常不需要打印日志，但是在定位问题时候，就需要知道某个函数的出入参这种，就可以使用
 
 ```java
-@WatchLogger(group = "business")
+@Watcher(group = "business")
 @RequestMapping("api/sample/biz")
 @RestController
 public class BusinessController {
@@ -43,7 +43,7 @@ public class BusinessController {
     @Autowired
     private BusinessService businessService;
 
-    @WatchLogger(group = "insert")
+    @Watcher(group = "insert")
     @PostMapping("troyTest")
     public FunRsp troyTest(@RequestBody Fun1Req fun1Req) {
         return businessService.troyTest(fun1Req);
@@ -54,7 +54,7 @@ public class BusinessController {
 提示：修饰函数，则函数会覆盖类的注解
 
 ### 所有分组列表
-> curl http://localhost:port/api/auto/logger/actuator/group/list
+> curl http://localhost:port/api/troy/log/actuator/group/list
 
 输出：
 ```json
@@ -68,7 +68,7 @@ public class BusinessController {
 其中host和port都是自己业务的，以下都一样
 
 ### 分组下的所有函数
-> curl http://localhost:port/api/auto/logger/actuator/group/fun/list?group={group}
+> curl http://localhost:port/api/troy/log/actuator/group/fun/list?group={group}
 
 输出：
 ```json
@@ -82,7 +82,7 @@ public class BusinessController {
 其中前面是funId，后面是对应的函数展示
 
 ### 分组全部信息
-> curl http://localhost:port/api/auto/logger/actuator/group/fun/info/all?group={group}
+> curl http://localhost:port/api/troy/log/actuator/group/fun/info/all?group={group}
 
 输出：
 ```json
@@ -103,7 +103,7 @@ public class BusinessController {
 ```
 
 ### 分组函数信息
-> curl http://localhost:port/api/auto/logger/actuator/group/fun/info/one/logger?group={group}&logFunId={funId}
+> curl http://localhost:port/api/troy/log/actuator/group/fun/info/one/logger?group={group}&logFunId={funId}
 
 输出：
 ```json
@@ -116,28 +116,28 @@ public class BusinessController {
 
 ### 全组更新
 将分组的所有的函数的日志信息更新
-> curl -X POST http://localhost:port/api/auto/logger/actuator/group?group={group}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/actuator/group?group={group}&logLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
 
 ### 全组更新并输出到控制台
 将分组的所有函数日志信息更新，并添加控制台的appender，输出到控制台
-> curl -X POST http://localhost:port/api/auto/logger/actuator/group/console?group={group}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/actuator/group/console?group={group}&logLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
 
 ### 全组更新并输出到文件
 将分组的所有函数日志信息更新，并添加文件的appender，输出到文件
-> curl -X POST http://localhost:port/api/auto/logger/actuator/group/file?group={group}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/actuator/group/file?group={group}&logLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
 
 ### 全组更新并输出
 将分组的所有函数日志信息更新，并添加控制台和文件的appender，输出到控制台和文件
-> curl -X POST http://localhost:port/api/auto/logger/actuator/group/all?group={group}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/actuator/group/all?group={group}&logLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
@@ -146,28 +146,28 @@ n
 
 ### 分组内函数更新
 将分组内的某个函数的日志信息更新
-> curl -X POST http://localhost:port/api/auto/logger/actuator/group/fun/change?funId={funId}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/actuator/group/fun/change?funId={funId}&logLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
 
 ### 分组内函数更新并输出到控制台
 将分组的所有函数日志信息更新，并添加控制台的appender，输出到控制台
-> curl -X POST http://localhost:port/api/auto/logger/actuator/group/fun/print/console?group={group}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/actuator/group/fun/print/console?group={group}&logLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
 
 ### 分组内函数更新并输出到文件
 将分组的所有函数日志信息更新，并添加文件的appender，输出到文件
-> curl -X POST http://localhost:port/api/auto/logger/actuator/group/fun/print/file?group={group}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/actuator/group/fun/print/file?group={group}&logLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
 
 ### 分组内函数更新并输出
 将分组的所有函数日志信息更新，并添加控制台和文件的appender，输出到控制台和文件
-> curl -X POST http://localhost:port/api/auto/logger/actuator/group/fun/print/all?group={group}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/actuator/group/fun/print/all?group={group}&logLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
@@ -176,7 +176,7 @@ n
 ## logger（日志记录器）
 
 ### 查看所有logger
-> curl http://localhost:port/api/auto/logger/actuator/logger
+> curl http://localhost:port/api/troy/log/actuator/logger
 
 输出：
 ```json
@@ -188,22 +188,17 @@ n
             {
                 "appenderName": "STDOUT",
                 "appenderPattern": "%yellow(%d{yyyy-MM-dd HH:mm:ss.SSS}) %black(shizi-2.local) %highlight(%p) --- %cyan([troy-sample]) %yellow([%X{traceId}]) %black(%c) %black(%M) %black([%t@42976]) : %green(%m%n)"
+            },{
+                "more": ".....更多...."
             }
-//       ... 更多 ...
         ]
     }
 ]
 ```
 
-### 查看root的日志级别
-> curl http://localhost:port/api/auto/logger/actuator/logger/root
-
-输出（DEBUG、INFO、WARN...）：
-DEBUG
-
 ### logger查找
 模糊匹配匹配到的logger
-> curl http://localhost:port/api/auto/logger/actuator/logger/search/list?loggerName={loggerName}
+> curl http://localhost:port/api/troy/log/actuator/logger/{loggerName}
 
 输出：
 ```json
@@ -216,33 +211,28 @@ DEBUG
 ]
 ```
 
-### 变更root日志级别
-> curl -X POST http://localhost:port/api/auto/logger/actuator/logger/actuator/logger?logLevel={logLevel}
-
-输出（个数）：
-n
-
 ### 变更某个logger日志级别
-> curl -X POST http://localhost:port/api/auto/logger/actuator/logger/name?loggerName={loggerName}&logLevel={logLevel}
+loggerName如果为root，则为修改root日志级别
+> curl -X POST http://localhost:port/api/troy/log/actuator/logger?loggerName={loggerName}&logLevel={logLevel}
 
 输出（个数）：
 n
 
-### 变更某个logger并输出到控制台
-> curl -X POST http://localhost:port/api/auto/logger/actuator/logger/name/console?loggerName={loggerName}&logLevel={logLevel}
+### 添加某个logger并输出到控制台
+> curl -X POST http://localhost:port/api/troy/log/actuator/logger/name/console?loggerName={loggerName}&logLevel={logLevel}
 
 输出（个数）：
 n
 
-### 变更某个logger并输出到文件
-> curl -X POST http://localhost:port/api/auto/logger/actuator/logger/name/file?loggerName={loggerName}&logLevel={logLevel}
+### 添加某个logger并输出到文件
+> curl -X POST http://localhost:port/api/troy/log/actuator/logger/name/file?loggerName={loggerName}&logLevel={logLevel}
 
 输出（个数）：
 n
 
-### 变更某个logger并输出
+### 添加某个logger并输出
 变更并输出到文件和控制台
-> curl -X POST http://localhost:port/api/auto/logger/actuator/logger/name/all?loggerName={loggerName}&logLevel={logLevel}
+> curl -X POST http://localhost:port/api/troy/log/actuator/logger/name/all?loggerName={loggerName}&logLevel={logLevel}
 
 输出（个数）：
 n
@@ -253,14 +243,14 @@ n
 
 ### 添加自定义控制台输出器
 添加某个logger的appender到控制台
-> curl -X POST http://localhost:port/api/auto/logger/actuator/appender/console?loggerName={loggerName}&logLevel={logLevel}
+> curl -X POST http://localhost:port/api/troy/log/actuator/appender/console?loggerName={loggerName}&logLevel={logLevel}
 
 输出（个数）：
 n
 
 ### 添加自定义文件输出器
 添加某个logger的appender到文件
-> curl -X POST http://localhost:port/api/auto/logger/actuator/appender/file?loggerName={loggerName}&logLevel={logLevel}
+> curl -X POST http://localhost:port/api/troy/log/actuator/appender/file?loggerName={loggerName}&logLevel={logLevel}
 
 输出（个数）：
 n
@@ -268,7 +258,7 @@ n
 
 ### 添加自定义控制台和文件输出器
 添加某个logger的appender到文件也到控制台
-> curl -X POST http://localhost:port/api/auto/logger/actuator/appender/all?loggerName={loggerName}&logLevel={logLevel}
+> curl -X POST http://localhost:port/api/troy/log/actuator/appender/all?loggerName={loggerName}&logLevel={logLevel}
 
 输出（个数）：
 n
@@ -276,26 +266,26 @@ n
 ---
 
 ### 删除某个appender
-> curl -X DELETE http://localhost:port/api/auto/logger/actuator/appender?loggerName={LoggerName}
+> curl -X DELETE http://localhost:port/api/troy/log/actuator/appender?loggerName={LoggerName}
 
 输出（个数）：
 n
 
 ### 删除自定义文件输出器
-> curl -X DELETE http://localhost:port/api/auto/logger/actuator/appender/file?loggerName={LoggerName}
+> curl -X DELETE http://localhost:port/api/troy/log/actuator/appender/file?loggerName={LoggerName}
 
 输出（个数）：
 n
 
 ### 删除自定义控制台输出器
-> curl -X DELETE http://localhost:port/api/auto/logger/actuator/appender/console?loggerName={LoggerName}
+> curl -X DELETE http://localhost:port/api/troy/log/actuator/appender/console?loggerName={LoggerName}
 
 输出（个数）：
 n
 
 ### 删除自定义输出器
 这里会删除文件也会删除控制台
-> curl -X DELETE http://localhost:port/api/auto/logger/actuator/appender/all?loggerName={LoggerName}
+> curl -X DELETE http://localhost:port/api/troy/log/actuator/appender/all?loggerName={LoggerName}
 
 输出（个数）：
 n

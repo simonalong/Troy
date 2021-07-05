@@ -30,5 +30,5 @@ public interface TroyConstants {
     /**
      * 默认的api前缀
      */
-    String DEFAULT_API_PREFIX = "/api/troy/logger/actuator";
+    String DEFAULT_API_PREFIX = "/api/troy/log/actuator";
 }

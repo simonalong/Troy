@@ -63,13 +63,12 @@ public class GroupEndpoint {
      * @param arg1     info
      * @param arg2     one
      * @param arg3     logger
-     * @param group    分组
      * @param logFunId 函数id
      * @return 日志信息
      */
     @ReadOperation
-    public LoggerBeanWrapperRsp getLoggerInfo(@Selector String arg0, @Selector String arg1, @Selector String arg2, @Selector String arg3, String group, String logFunId) {
-        return LoggerInvoker.getLoggerInfo(group, logFunId);
+    public LoggerBeanWrapperRsp getLoggerInfo(@Selector String arg0, @Selector String arg1, @Selector String arg2, @Selector String arg3, String logFunId) {
+        return LoggerInvoker.getLoggerInfo(logFunId);
     }
 
     /**
@@ -108,8 +107,8 @@ public class GroupEndpoint {
         } else if ("file".equals(arg0)) {
             return DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
         } else if ("all".equals(arg0)) {
-            DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
-            return DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
+            Integer count = DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
+            return count + DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
         }
         return 0;
     }
