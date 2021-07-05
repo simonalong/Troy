@@ -1,11 +1,8 @@
 package com.github.simonalong.troy.endpoint;
 
-import com.alibaba.fastjson.JSON;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
-
-import java.util.*;
 
 import static com.github.simonalong.troy.TroyConstants.API;
 
