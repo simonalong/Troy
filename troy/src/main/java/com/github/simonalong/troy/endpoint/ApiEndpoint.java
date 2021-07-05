@@ -24,13 +24,33 @@ public class ApiEndpoint {
      *
      * @return 分组名列表
      */
+    @SuppressWarnings("all")
     @ReadOperation
     public String getList() {
-        Map<String, Map<String, String>> apiMap = new LinkedHashMap<>();
-        apiMap.put("分组", generateGroup());
-        apiMap.put("logger", generateLogger());
-        apiMap.put("appender", generateAppender());
-        return JSON.toJSONString(apiMap);
+        StringBuffer apiMessage = new StringBuffer();
+        apiMessage.append("====================== 分组 ===========================").append("\n");
+        apiMessage.append("查询：分组列表          ").append("curl " + apiPrefix() + "/api/troy/log/actuator/group/list").append("\n");
+        apiMessage.append("查询：分组函数列表      ").append("curl " + apiPrefix() + "/api/troy/log/actuator/group/fun/list?group={group}").append("\n");
+        apiMessage.append("变更：更新分组信息      ").append("curl -X POST " + apiPrefix() + "/api/troy/log/actuator/group?group={group}&logLevel={logLevel}&enable={enable}").append("\n");
+        apiMessage.append("变更：某个函数更新      ").append("curl -X POST " + apiPrefix() + "/api/troy/log/actuator/group/fun/change?funId={funId}&logLevel={logLevel}&enable={enable}").append("\n");
+        apiMessage.append("-------------------------日志-------------------------------------------------------").append("\n");
+        apiMessage.append("查询：分组某个函数信息  ").append("curl " + apiPrefix() + "/api/troy/log/actuator/group/fun/info/one/logger?group={group}&logFunId={funId}").append("\n");
+        apiMessage.append("查询：分组函数全部信息  ").append("curl " + apiPrefix() + "/api/troy/log/actuator/group/fun/info/all?group={group}").append("\n");
+        apiMessage.append("-------------------------输出--------------------------------------------------------").append("\n");
+        apiMessage.append("变更：添加分组输出      ").append("curl -X POST " + apiPrefix() + "/api/troy/log/actuator/group/(console/file/all)?group={group}&logLevel={logLevel}&enable={enable}").append("\n");
+        apiMessage.append("变更：添加函数输出      ").append("curl -X POST " + apiPrefix() + "/api/troy/log/actuator/group/fun/print/(console/file/all)?funId={funId}&logLevel={logLevel}&enable={enable}").append("\n");
+
+        apiMessage.append("====================== logger ========================").append("\n");
+        apiMessage.append("查询：logger列表        ").append("curl " + apiPrefix() + "/api/troy/log/actuator/logger").append("\n");
+        apiMessage.append("查询：logger搜索        ").append("curl " + apiPrefix() + "/api/troy/log/actuator/logger/{loggerName}").append("\n");
+        apiMessage.append("更新：logger更新级别    ").append("curl " + apiPrefix() + "/api/troy/log/actuator/logger?loggerName={loggerName}&logLevel={logLevel}").append("\n");
+        apiMessage.append("====================== appender ======================").append("\n");
+        apiMessage.append("更新：添加输出器        ").append("curl " + apiPrefix() + "/api/troy/log/actuator/appender/console?loggerName={loggerName}&logLevel={logLevel}").append("\n");
+        apiMessage.append("删除：删除某个输出器    ").append("curl " + apiPrefix() + "/api/troy/log/actuator/appender?loggerName={loggerName}").append("\n");
+        apiMessage.append("删除：删除输出器        ").append("curl " + apiPrefix() + "/api/troy/log/actuator/appender/(console/file/all)?loggerName={loggerName}").append("\n");
+        apiMessage.append("======================================================").append("\n");
+
+        return apiMessage.toString();
     }
 
     /**
@@ -45,37 +65,6 @@ public class ApiEndpoint {
         this.localIp = ip;
         this.port = port;
         return 1;
-    }
-
-    private Map<String, String> generateGroup() {
-        Map<String, String> pair = new LinkedHashMap<>();
-        pair.put("查询：分组列表", "curl " + apiPrefix() + "/api/troy/log/actuator/group/list");
-        pair.put("查询：分组函数列表", "curl " + apiPrefix() + "/api/troy/log/actuator/group/fun/list?group={group}");
-        pair.put("变更：更新分组信息", "curl -X POST " + apiPrefix() + "/api/troy/log/actuator/group?group={group}&logLevel={logLevel}&enable={enable}");
-        pair.put("变更：某个函数更新", "curl -X POST " + apiPrefix() + "/api/troy/log/actuator/group/fun/change?funId={funId}&logLevel={logLevel}&enable={enable}");
-        pair.put("-----日志-----", "--------------------------------------------------");
-        pair.put("查询：分组某个函数信息", "curl " + apiPrefix() + "/api/troy/log/actuator/group/fun/info/one/logger?group={group}&logFunId={funId}");
-        pair.put("查询：分组函数全部信息", "curl " + apiPrefix() + "/api/troy/log/actuator/group/fun/info/all?group={group}");
-        pair.put("----输出------", "--------------------------------------------------");
-        pair.put("变更：添加分组输出", "curl -X POST " + apiPrefix() + "/api/troy/log/actuator/group/(console/file/all)?group={group}&logLevel={logLevel}&enable={enable}");
-        pair.put("变更：添加函数输出", "curl -X POST " + apiPrefix() + "/api/troy/log/actuator/group/fun/print/(console/file/all)?funId={funId}&logLevel={logLevel}&enable={enable}");
-        return pair;
-    }
-
-    private Map<String, String> generateLogger() {
-        Map<String, String> pair = new LinkedHashMap<>();
-        pair.put("查询：logger列表", "curl " + apiPrefix() + "/api/troy/log/actuator/logger");
-        pair.put("查询：logger搜索", "curl " + apiPrefix() + "/api/troy/log/actuator/logger/{loggerName}");
-        pair.put("更新：logger更新级别", "curl " + apiPrefix() + "/api/troy/log/actuator/logger?loggerName={loggerName}&logLevel={logLevel}");
-        return pair;
-    }
-
-    private Map<String, String> generateAppender() {
-        Map<String, String> pair = new LinkedHashMap<>();
-        pair.put("更新：添加输出器", "curl " + apiPrefix() + "/api/troy/log/actuator/appender/console?loggerName={loggerName}&logLevel={logLevel}");
-        pair.put("删除：删除某个输出器", "curl " + apiPrefix() + "/api/troy/log/actuator/appender?loggerName={loggerName}");
-        pair.put("删除：删除输出器", "curl " + apiPrefix() + "/api/troy/log/actuator/appender/(console/file/all)?loggerName={loggerName}");
-        return pair;
     }
 
     private String apiPrefix() {
