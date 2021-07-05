@@ -28,13 +28,7 @@ public class TroyAop {
         Signature sig = pjp.getSignature();
         MethodSignature methodSignature = (MethodSignature) sig;
 
-        Method currentMethod;
-        try {
-            currentMethod = pjp.getTarget().getClass().getMethod(methodSignature.getName(), methodSignature.getParameterTypes());
-        } catch (NoSuchMethodException e) {
-            throw e;
-        }
-
+        Method currentMethod = pjp.getTarget().getClass().getMethod(methodSignature.getName(), methodSignature.getParameterTypes());
         Watcher watcher = null;
         if (currentMethod.getDeclaringClass().isAnnotationPresent(Watcher.class)) {
             watcher = currentMethod.getDeclaringClass().getAnnotation(Watcher.class);
