@@ -28,9 +28,9 @@ public interface TroyConstants {
      */
     String APPENDER = "appender";
     /**
-     * 功能api列表
+     * 功能api帮助
      */
-    String API = "api";
+    String HELP = "help";
     /**
      * 默认的api前缀
      */
