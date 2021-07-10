@@ -25,28 +25,28 @@ public class HelpEndpoint {
     @ReadOperation
     public String getList() {
         StringBuffer apiMessage = new StringBuffer();
-        apiMessage.append("============================================================================================================").append("\n");
-        apiMessage.append("help 查询：命令列表          ").append("curl " + apiPrefix() + "/help").append("\n");
-        apiMessage.append("help 查询：修改ip和port      ").append("curl " + withJson() + " '" + apiPrefix() + "/help?ip={ip}&port={port}'").append("\n");
-        apiMessage.append("============================================").append("\n");
-        apiMessage.append("分组 查询：分组列表          ").append("curl '" + apiPrefix() + "/group/list'").append("\n");
-        apiMessage.append("分组 查询：分组函数列表      ").append("curl '" + apiPrefix() + "/group/fun/list?group={group}'").append("\n");
-        apiMessage.append("分组 变更：更新分组信息      ").append("curl " + withJson() + " '" + apiPrefix() + "/group?group={group}&logLevel={logLevel}&enable={enable}'").append("\n");
-        apiMessage.append("分组 变更：某个函数更新      ").append("curl " + withJson() + " '" + apiPrefix() + "/group/fun/change?funId={funId}&logLevel={logLevel}&enable={enable}'").append("\n");
+        apiMessage.append("help：============================================================================================================").append("\n");
+        apiMessage.append("help 查询：命令列表         ").append("curl " + apiPrefix() + "/help").append("\n");
+        apiMessage.append("help 查询：修改ip和port     ").append("curl " + withJson() + " '" + apiPrefix() + "/help?ip={ip}&port={port}'").append("\n");
+        apiMessage.append("=========== 分组：========================================").append("\n");
+        apiMessage.append("查询：分组列表              ").append("curl '" + apiPrefix() + "/group/list'").append("\n");
+        apiMessage.append("查询：分组函数列表          ").append("curl '" + apiPrefix() + "/group/fun/list?group={group}'").append("\n");
+        apiMessage.append("变更：更新分组信息          ").append("curl " + withJson() + " '" + apiPrefix() + "/group?group={group}&logLevel={logLevel}&enable={enable}'").append("\n");
+        apiMessage.append("变更：某个函数更新          ").append("curl " + withJson() + " '" + apiPrefix() + "/group/fun/change?funId={funId}&logLevel={logLevel}&enable={enable}'").append("\n");
         apiMessage.append("------日志------------").append("\n");
-        apiMessage.append("分组 日志查询：分组某个函数信息  ").append("curl '" + apiPrefix() + "/group/fun/info/one/logger?logFunId={funId}'").append("\n");
-        apiMessage.append("分组 日志查询：分组函数全部信息  ").append("curl '" + apiPrefix() + "/group/fun/info/all?group={group}'").append("\n");
+        apiMessage.append("日志查询：分组某个函数信息  ").append("curl '" + apiPrefix() + "/group/fun/info/one/logger?logFunId={funId}'").append("\n");
+        apiMessage.append("日志查询：分组函数全部信息  ").append("curl '" + apiPrefix() + "/group/fun/info/all?group={group}'").append("\n");
         apiMessage.append("------输出------------").append("\n");
-        apiMessage.append("分组 输出变更：添加分组输出      ").append("curl " + withJson() + " '" + apiPrefix() + "/group/(console/file/all)?group={group}&logLevel={logLevel}&enable={enable}'").append("\n");
-        apiMessage.append("分组 输出变更：添加函数输出      ").append("curl " + withJson() + " '" + apiPrefix() + "/group/fun/print/(console/file/all)?funId={funId}&logLevel={logLevel}&enable={enable}'").append("\n");
-        apiMessage.append("============================================").append("\n");
-        apiMessage.append("logger 查询：logger列表        ").append("curl '" + apiPrefix() + "/logger'").append("\n");
-        apiMessage.append("logger 查询：logger搜索        ").append("curl '" + apiPrefix() + "/logger/{loggerName}'").append("\n");
-        apiMessage.append("logger 更新：logger更新级别    ").append("curl " + withJson() + " '" + apiPrefix() + "/logger?loggerName={loggerName}&logLevel={logLevel}'").append("\n");
-        apiMessage.append("============================================").append("\n");
-        apiMessage.append("appender 更新：添加输出器        ").append("curl " + withJson() + " '" + apiPrefix() + "/appender/console?loggerName={loggerName}&logLevel={logLevel}'").append("\n");
-        apiMessage.append("appender 删除：删除某个输出器    ").append("curl -X DELETE '" + apiPrefix() + "/appender?loggerName={loggerName}'").append("\n");
-        apiMessage.append("appender 删除：删除输出器        ").append("curl -X DELETE '" + apiPrefix() + "/appender/(console/file/all)?loggerName={loggerName}'").append("\n");
+        apiMessage.append("输出变更：添加分组输出      ").append("curl " + withJson() + " '" + apiPrefix() + "/group/(console/file/all)?group={group}&logLevel={logLevel}&enable={enable}'").append("\n");
+        apiMessage.append("输出变更：添加函数输出      ").append("curl " + withJson() + " '" + apiPrefix() + "/group/fun/print/(console/file/all)?funId={funId}&logLevel={logLevel}&enable={enable}'").append("\n");
+        apiMessage.append("=========== logger：======================================").append("\n");
+        apiMessage.append("查询：logger列表            ").append("curl '" + apiPrefix() + "/logger'").append("\n");
+        apiMessage.append("查询：logger搜索            ").append("curl '" + apiPrefix() + "/logger/{loggerName}'").append("\n");
+        apiMessage.append("更新：logger更新级别        ").append("curl " + withJson() + " '" + apiPrefix() + "/logger?loggerName={loggerName}&logLevel={logLevel}'").append("\n");
+        apiMessage.append("=========== appender：====================================").append("\n");
+        apiMessage.append("更新：添加输出器            ").append("curl " + withJson() + " '" + apiPrefix() + "/appender/console?loggerName={loggerName}&logLevel={logLevel}'").append("\n");
+        apiMessage.append("删除：删除某个输出器        ").append("curl -X DELETE '" + apiPrefix() + "/appender?loggerName={loggerName}'").append("\n");
+        apiMessage.append("删除：删除输出器            ").append("curl -X DELETE '" + apiPrefix() + "/appender/(console/file/all)?loggerName={loggerName}'").append("\n");
         apiMessage.append("============================================================================================================").append("\n");
 
         return apiMessage.toString();
