@@ -25,7 +25,7 @@ public class HelpEndpoint {
     @ReadOperation
     public String getList() {
         StringBuffer apiMessage = new StringBuffer();
-        apiMessage.append("help：============================================================================================================").append("\n");
+        apiMessage.append("===========================================================================================================").append("\n");
         apiMessage.append("help 查询：命令列表         ").append("curl " + apiPrefix() + "/help").append("\n");
         apiMessage.append("help 查询：修改ip和port     ").append("curl " + withJson() + " '" + apiPrefix() + "/help?ip={ip}&port={port}'").append("\n");
         apiMessage.append("=========== 分组：========================================").append("\n");
