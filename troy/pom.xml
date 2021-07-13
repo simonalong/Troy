@@ -195,4 +195,19 @@
 <!--            </plugin>-->
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus-releases</id>
+            <name>Nexus Release Repository</name>
+            <url>http://10.30.30.3:8081/repository/maven-releases/</url>
+            <!--<url>https://maven.isyscore.com/repository/maven-releases/</url>-->
+        </repository>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <name>Nexus Snapshot Repository</name>
+            <url>http://10.30.30.3:8081/repository/maven-snapshots/</url>
+            <!--<url>https://maven.isyscore.com/repository/isys-openapi-snapshots/</url>-->
+        </snapshotRepository>
+    </distributionManagement>
 </project>

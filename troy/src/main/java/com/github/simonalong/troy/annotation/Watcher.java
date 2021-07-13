@@ -12,6 +12,13 @@ import java.lang.annotation.*;
 public @interface Watcher {
 
     /**
+     * 分组名，同group
+     *
+     * @return 分组
+     */
+    String[] value() default "default";
+
+    /**
      * 分组
      *
      * @return 分组

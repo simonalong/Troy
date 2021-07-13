@@ -44,7 +44,7 @@ public class HelpEndpoint {
         apiMessage.append("查询：logger搜索            ").append("curl '" + apiPrefix() + "/logger/{loggerName}'").append("\n");
         apiMessage.append("更新：logger更新级别        ").append("curl " + withJson() + " '" + apiPrefix() + "/logger?loggerName={loggerName}&logLevel={logLevel}'").append("\n");
         apiMessage.append("=========== appender：====================================").append("\n");
-        apiMessage.append("更新：添加输出器            ").append("curl " + withJson() + " '" + apiPrefix() + "/appender/console?loggerName={loggerName}&logLevel={logLevel}'").append("\n");
+        apiMessage.append("更新：添加输出器            ").append("curl " + withJson() + " '" + apiPrefix() + "/appender/(console/file/all)?loggerName={loggerName}&logLevel={logLevel}'").append("\n");
         apiMessage.append("删除：删除某个输出器        ").append("curl -X DELETE '" + apiPrefix() + "/appender?loggerName={loggerName}'").append("\n");
         apiMessage.append("删除：删除输出器            ").append("curl -X DELETE '" + apiPrefix() + "/appender/(console/file/all)?loggerName={loggerName}'").append("\n");
         apiMessage.append("============================================================================================================").append("\n");
