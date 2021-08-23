@@ -19,7 +19,7 @@ public class BusinessService {
     public FunRsp troyTest(Fun1Req fun1Req) {
         FunRsp rsp = new FunRsp();
         rsp.setAge(fun1Req.getAge());
-        rsp.setName("ok");
+        rsp.setName(fun1Req.getName());
         return rsp;
     }
 
@@ -33,11 +33,11 @@ public class BusinessService {
 
     public String debugTest(String name) {
         log.debug("ok,test, {}", name);
-        return "getResult";
+        return name;
     }
 
     public String debugTest2(String name) {
         log.debug("ok,test2, {}", name);
-        return "getResult";
+        return name;
     }
 }
