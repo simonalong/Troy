@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <springProperty scope="context" name="LOG_HOME" source="logging.path"/>
+    <Property resource="application.yml"/>
+
+    <!-- 定义APP_NAME-->
+    <property name="APP_NAME" value="troy-sample"/>
+
+    <!-- 定义日志根目录-->
+    <property name="LOG_FOLDER" value="${LOG_HOME}"/>
+
+    <!-- 定义日志Partten-->
+    <property name="PATTERN" value="%yellow(%d{yyyy-MM-dd HH:mm:ss.SSS}) %black(${hostname}) %highlight(%p) --- %cyan([${APP_NAME}]) %yellow([%X{traceId}]) %black(%c) %black(%M) %black([%t@${PID}]) : %green(%m%n)" />
+<!--    <property name="PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} ${HOSTNAME} [${APP_NAME}] [%X{traceId}] [%X{userId}] [%X{source}] %p %c %M [%t@${PID}] : %m%n"/>-->
+
+    <!-- 定义日志滚动文件后缀-->
+    <property name="ROLLING_SUFFIX" value="%d{yyyyMMdd}.%i"/>
+
+    <!-- 定义日志滚动大小临界值maxFileSize-->
+    <property name="MAX_FILE_SIZE" value="100MB"/>
+
+    <!-- 定义日志滚动时间临界值maxHistory-->
+    <property name="MAX_HISTORY" value="30"/>
+
+    <!-- 定义日志字符集-->
+    <property name="CHARSET" value="UTF-8"/>
+
+    <!-- 控制台输出配置-->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+            <charset>${CHARSET}</charset>
+        </encoder>
+    </appender>
+
+
+    <!-- 日志文件输出配置:根据filter.level配置的日志等级输出不同等级的日志文件,以INFO日志为例,输出app-info.log日志文件-->
+    <appender name="FILE_INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FOLDER}/app-info.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+            <charset>${CHARSET}</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FOLDER}/app-info.log.${ROLLING_SUFFIX}</fileNamePattern>
+            <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="FILE_WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FOLDER}/app-warn.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+            <charset>${CHARSET}</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FOLDER}/app-warn.log.${ROLLING_SUFFIX}</fileNamePattern>
+            <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_FOLDER}/app-error.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>${PATTERN}</pattern>
+            <charset>${CHARSET}</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_FOLDER}/app-error.log.${ROLLING_SUFFIX}</fileNamePattern>
+            <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+            <maxHistory>${MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <!-- 日志打印级别, 以下配置表示输出INFO级别以上日志-->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE_INFO" />
+        <appender-ref ref="FILE_WARN"/>
+        <appender-ref ref="FILE_ERROR" />
+    </root>
+
+</configuration>
