@@ -14,7 +14,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class TroyProperties {
 
     /**
-     * api前缀，比如：/api/troy/log/actuator
+     * api前缀，比如：/api/troy/log/
      */
     private String prefix;
     /**

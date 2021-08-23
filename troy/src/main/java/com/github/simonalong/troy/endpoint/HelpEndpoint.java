@@ -69,10 +69,15 @@ public class HelpEndpoint {
     }
 
     private String apiPrefix() {
-        String apiPre = "/api/troy/log/actuator";
+        String apiPre = "/api/troy/log";
         if(null != System.getProperty("management.endpoints.web.basePath") && !"".equals(System.getProperty("management.endpoints.web.basePath"))) {
             apiPre = System.getProperty("management.endpoints.web.basePath");
         }
+
+        if (null != apiPre && apiPre.endsWith("/")) {
+            apiPre = apiPre.substring(0, apiPre.length() -1);
+        }
+
         if (null != localIp && !"".endsWith(localIp) && 0 != port) {
             return "http://" + localIp + ":" + port + apiPre;
         }

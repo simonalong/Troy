@@ -1,6 +1,6 @@
 troy:
   log:
-    # 查询的api前缀，默认：/api/troy/log/actuator
-    prefix: /api/troy/log/actuator
+    # 查询的api前缀，默认：/api/troy/log/
+    prefix: /api/troy/log/
     # 是否启用，默认启用
     enable: true
