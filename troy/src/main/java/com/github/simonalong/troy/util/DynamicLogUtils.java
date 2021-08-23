@@ -48,7 +48,7 @@ public class DynamicLogUtils {
 
     public String getLevelOfRoot() {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        ch.qos.logback.classic.Logger logger = loggerContext.getLogger("root");
+        Logger logger = loggerContext.getLogger("root");
         return logger.getLevel().levelStr;
     }
 
@@ -63,20 +63,24 @@ public class DynamicLogUtils {
             return 0;
         }
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        ch.qos.logback.classic.Logger logger = loggerContext.getLogger("root");
+        Logger logger = loggerContext.getLogger("root");
         logger.setLevel(Level.toLevel(logLevel));
         return 1;
     }
 
     public Integer setLevelOfLogger(String loggerName, String logLevel) {
+        return setLevelOfLogger(loggerName, logLevel, false);
+    }
+
+    public Integer setLevelOfLogger(String loggerName, String logLevel, Boolean additive) {
         if (null == logLevel || "".equals(logLevel) || !logLevelSet.contains(logLevel.toUpperCase())) {
             return 0;
         }
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
-        ch.qos.logback.classic.Logger logger = loggerContext.getLogger(loggerName);
+        Logger logger = loggerContext.getLogger(loggerName);
         if (null != logger) {
             logger.setLevel(Level.toLevel(logLevel));
-            logger.setAdditive(false);
+            logger.setAdditive(additive);
             return 1;
         }
         return 0;

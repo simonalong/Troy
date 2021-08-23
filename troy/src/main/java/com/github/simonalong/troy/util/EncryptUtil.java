@@ -1,13 +1,13 @@
 package com.github.simonalong.troy.util;
 
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
-
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
 
 
 /**

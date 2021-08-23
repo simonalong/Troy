@@ -108,7 +108,7 @@ public class BusinessController {
 输出：
 ```json
 {
-    "logFunName": "com.isyscore.os.sample.controller.BusinessController#troyTest(com.isyscore.os.sample.vo.req.Fun1Req)",
+    "logFunName": "com.github.simonalong.sample.controller.BusinessController#troyTest(com.github.simonalong.sample.vo.req.Fun1Req)",
     "logLevel": "INFO",
     "loggerEnable": false
 }
@@ -204,7 +204,7 @@ n
 ```json
 [
     {
-        "loggerName": "com.isyscore.os.sample.service.BusinessService",
+        "loggerName": "com.github.simonalong.sample.service.BusinessService",
         "logLevelStr": "INFO",
         "appenderList": []
     }

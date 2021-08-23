@@ -65,7 +65,7 @@ public class LoggerEndpoint {
     /**
      * 将logger级别变更并打印
      *
-     * @param arg0 name
+     * @param arg0 appender
      * @param arg1 console、file或者all
      * @param logLevel 日志级别
      * @return 操作结果：0-没有修改，1-修改完成
@@ -84,6 +84,23 @@ public class LoggerEndpoint {
         } else {
             return 0;
         }
+    }
+
+    /**
+     * 将logger信息恢复到初始
+     *
+     * @param arg0 restore
+     * @param arg1 all
+     * @param arg2 info
+     * @param logLevel 日志级别
+     * @return 操作结果：0-没有修改，1-修改完成
+     */
+    @WriteOperation
+    public Integer restoreAllInfo(@Selector String arg0, @Selector String arg1, @Selector String arg2, String loggerName, String logLevel) {
+        DynamicLogUtils.setLevelOfLogger(loggerName, logLevel, true);
+
+        DynamicLogUtils.deleteAppenderOfConsole(loggerName);
+        return DynamicLogUtils.deleteAppenderOfFile(loggerName);
     }
 
     private LoggerAllRspEntity loggerToEntity(Logger logger) {
