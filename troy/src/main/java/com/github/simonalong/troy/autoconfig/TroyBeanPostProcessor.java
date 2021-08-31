@@ -4,8 +4,10 @@ import com.alibaba.fastjson.parser.ParserConfig;
 import com.github.simonalong.troy.annotation.Watcher;
 import com.github.simonalong.troy.log.LoggerInvoker;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.AdvisedSupport;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.aop.target.SimpleBeanTargetSource;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.lang.Nullable;
@@ -69,7 +71,10 @@ public class TroyBeanPostProcessor implements BeanPostProcessor {
 
         Field advised = dynamicAdvisedInterceptor.getClass().getDeclaredField("advised");
         advised.setAccessible(true);
-
-        return ((AdvisedSupport) advised.get(dynamicAdvisedInterceptor)).getTargetSource().getTarget();
+        TargetSource targetSource = ((AdvisedSupport) advised.get(dynamicAdvisedInterceptor)).getTargetSource();
+        if (targetSource instanceof SimpleBeanTargetSource) {
+            return proxy;
+        }
+        return targetSource.getTarget();
     }
 }
