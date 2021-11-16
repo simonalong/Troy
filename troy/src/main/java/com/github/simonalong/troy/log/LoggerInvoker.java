@@ -207,7 +207,7 @@ public class LoggerInvoker {
 
             TreeMap<String, Object> outInfo = new TreeMap<>();
             outInfo.put("response", result);
-            printLog(funLoggerBeanWrapper, outInfo, method, args);
+            printLog(group, funLoggerBeanWrapper, outInfo, method, args);
             return;
         }
     }
@@ -251,12 +251,13 @@ public class LoggerInvoker {
             TreeMap<String, Object> outInfo = new TreeMap<>();
             outInfo.put("throwable", throwable);
 
-            printLog(funLoggerBeanWrapper, outInfo, method, args);
+            printLog(group, funLoggerBeanWrapper, outInfo, method, args);
             return;
         }
     }
 
-    private void printLog(FunLoggerBeanWrapper beanWrapper, TreeMap<String, Object> outInfo, Method method, Object[] args) {
+    private void printLog(String group, FunLoggerBeanWrapper beanWrapper, TreeMap<String, Object> outInfo, Method method, Object[] args) {
+        outInfo.put("group", group);
         outInfo.put("fun", method.toString());
         outInfo.put("parameters", Arrays.asList(args));
 
