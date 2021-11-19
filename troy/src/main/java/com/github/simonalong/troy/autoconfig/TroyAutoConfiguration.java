@@ -30,7 +30,7 @@ public class TroyAutoConfiguration {
 
     @Bean
     public TroyBeanPostProcessor beanPostProcessor(TroyProperties troyProperties) {
-        List<String> endpointList = Arrays.asList(HELP, GROUP, LOGGER, APPENDER);
+        List<String> endpointList = Arrays.asList(HELP, GROUP, LOGGER, APPENDER, ENVIRONMENT);
         System.setProperty("management.endpoints.web.exposure.include", String.join(", ", endpointList));
         System.setProperty("management.endpoints.web.basePath", DEFAULT_API_PREFIX);
 
@@ -51,26 +51,32 @@ public class TroyAutoConfiguration {
 
         @Bean
         @ConditionalOnMissingBean
-        public HelpEndpoint apiEndpoint() {
+        public HelpEndpoint troyHelpEndpoint() {
             return new HelpEndpoint();
         }
 
         @Bean
         @ConditionalOnMissingBean
-        public GroupEndpoint groupEndpoint() {
+        public GroupEndpoint troyGroupEndpoint() {
             return new GroupEndpoint();
         }
 
         @Bean
         @ConditionalOnMissingBean
-        public LoggerEndpoint loggerEndpoint() {
+        public LoggerEndpoint troyLoggerEndpoint() {
             return new LoggerEndpoint();
         }
 
         @Bean
         @ConditionalOnMissingBean
-        public AppenderEndpoint appenderEndpoint() {
+        public AppenderEndpoint troyAppenderEndpoint() {
             return new AppenderEndpoint();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public EnvEndpoint troyEnv() {
+            return new EnvEndpoint();
         }
     }
 }

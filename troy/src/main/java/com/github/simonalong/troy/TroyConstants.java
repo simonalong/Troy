@@ -28,6 +28,10 @@ public interface TroyConstants {
      */
     String APPENDER = "appender";
     /**
+     * environment
+     */
+    String ENVIRONMENT = "en";
+    /**
      * 功能api帮助
      */
     String HELP = "help";

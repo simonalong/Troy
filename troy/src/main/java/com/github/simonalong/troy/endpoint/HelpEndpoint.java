@@ -63,6 +63,10 @@ public class HelpEndpoint {
         appenderMap.put("删除：删除输出器", "curl -X DELETE '" + apiPrefix() + "/appender/(console/file/all)?loggerName={loggerName}'");
         infoMap.put("appender", appenderMap);
 
+        Map<String, String> envMap = new LinkedHashMap<>();
+        envMap.put("设置：环境变量", "curl " + withJson() + " '" + apiPrefix() + "/en/set?key={key}&value={value}'");
+        envMap.put("查询：环境变量", "curl '" + apiPrefix() + "/en/get?key={key}'");
+        infoMap.put("环境变量", envMap);
         return infoMap;
     }
 
