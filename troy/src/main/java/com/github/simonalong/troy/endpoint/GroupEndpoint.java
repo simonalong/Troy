@@ -97,7 +97,7 @@ public class GroupEndpoint {
     public Integer updateGroupAllLoggerAndPrint(@Selector String arg0, String group, String printLogLevel, Boolean enable) {
         LoggerInvoker.updateLoggerBeanLog(group, printLogLevel, enable);
 
-        String loggerName = "com.isyscore.os.troy.log.LoggerInvoker";
+        String loggerName = "com.github.simonalong.troy.log.LoggerInvoker";
 
         // 设置logger的日志级别
         DynamicLogUtils.setLevelOfLogger(loggerName, printLogLevel);
@@ -140,7 +140,7 @@ public class GroupEndpoint {
     public Integer updateFunLoggerAndPrint(@Selector String arg0, @Selector String arg1, @Selector String arg2, String funId, String printLogLevel, Boolean enable) {
         LoggerInvoker.updateLoggerBeanLogOfFunId(funId, printLogLevel, enable);
 
-        String loggerName = "com.isyscore.os.troy.log.LoggerInvoker";
+        String loggerName = "com.github.simonalong.troy.log.LoggerInvoker";
 
         // 设置logger的日志级别
         DynamicLogUtils.setLevelOfLogger(loggerName, printLogLevel);

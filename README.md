@@ -1,5 +1,5 @@
 ## Troy
-日志在线管理框架，叫特洛伊，有点在暗处操控的意味
+日志在线管理框架
 
 # 背景
 在工作中遇到这么两个问题，然后根据对应问题编写了这么一个框架
@@ -12,7 +12,7 @@
 <dependency>
     <groupId>com.github.simonalong</groupId>
     <artifactId>troy</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -52,6 +52,45 @@ public class BusinessController {
 }
 ```
 提示：修饰函数，则函数会覆盖类的注解
+
+### 查看帮助
+> curl http://localhost:port/api/troy/log/help
+
+输出：
+```json
+{
+    "help":{
+        "help 查询：命令列表":"curl http://localhost:port/api/troy/log/help",
+        "help 查询：修改ip和port":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/help?ip={ip}&port={port}'"
+    },
+    "分组":{
+        "查询：分组列表":"curl 'http://localhost:port/api/troy/log/group/list'",
+        "查询：分组函数列表":"curl 'http://localhost:port/api/troy/log/group/fun/list?group={group}'",
+        "变更：更新分组信息":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/group?group={group}&printLogLevel={logLevel}&enable={enable}'",
+        "变更：某个函数更新":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/group/fun/change?funId={funId}&printLogLevel={logLevel}&enable={enable}'"
+    },
+    "分组-日志":{
+        "日志查询：分组某个函数信息":"curl 'http://localhost:port/api/troy/log/group/fun/info/one/logger?logFunId={funId}'",
+        "日志查询：分组函数全部信息":"curl 'http://localhost:port/api/troy/log/group/fun/info/all?group={group}'"
+    },
+    "分组-输出":{
+        "输出变更：添加分组输出":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/group/(console或者all)?group={group}&printLogLevel={logLevel}&enable={enable}'",
+        "输出变更：添加函数输出":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/group/fun/print/(console或者all)?funId={funId}&printLogLevel={logLevel}&enable={enable}'"
+    },
+    "logger":{
+        "查询：logger列表":"curl 'http://localhost:port/api/troy/log/logger'",
+        "查询：logger搜索":"curl 'http://localhost:port/api/troy/log/logger/{loggerName}'",
+        "更新：logger更新级别":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/logger?loggerName={loggerName}&logLevel={logLevel}'",
+        "更新：logger更新并输出":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/logger/appender/(console或者all)?loggerName={loggerName}&logLevel={logLevel}'",
+        "更新：logger处理恢复":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/logger/restore/all/info?loggerName={loggerName}&logLevel={logLevel}'"
+    },
+    "appender":{
+        "更新：添加输出器":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/appender/(console或者all)?loggerName={loggerName}&logLevel={logLevel}'",
+        "删除：删除某个输出器":"curl -X DELETE 'http://localhost:port/api/troy/log/appender?loggerName={loggerName}'",
+        "删除：删除输出器":"curl -X DELETE 'http://localhost:port/api/troy/log/appender/(console或者all)?loggerName={loggerName}'"
+    }
+}
+```
 
 ### 所有分组列表
 > curl http://localhost:port/api/troy/log/group/list
@@ -116,28 +155,28 @@ public class BusinessController {
 
 ### 全组更新
 将分组的所有的函数的日志信息更新
-> curl -X POST http://localhost:port/api/troy/log/group?group={group}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/group?group={group}&printLogLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
 
 ### 全组更新并输出到控制台
 将分组的所有函数日志信息更新，并添加控制台的appender，输出到控制台
-> curl -X POST http://localhost:port/api/troy/log/group/console?group={group}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/group/console?group={group}&printLogLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
 
-### 全组更新并输出到文件
+### 全组更新并输出到文件（弃用）
 将分组的所有函数日志信息更新，并添加文件的appender，输出到文件
-> curl -X POST http://localhost:port/api/troy/log/group/file?group={group}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/group/file?group={group}&printLogLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
 
 ### 全组更新并输出
 将分组的所有函数日志信息更新，并添加控制台和文件的appender，输出到控制台和文件
-> curl -X POST http://localhost:port/api/troy/log/group/all?group={group}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/group/all?group={group}&printLogLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
@@ -146,28 +185,28 @@ n
 
 ### 分组内函数更新
 将分组内的某个函数的日志信息更新
-> curl -X POST http://localhost:port/api/troy/log/group/fun/change?funId={funId}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/group/fun/change?funId={funId}&printLogLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
 
 ### 分组内函数更新并输出到控制台
 将分组的所有函数日志信息更新，并添加控制台的appender，输出到控制台
-> curl -X POST http://localhost:port/api/troy/log/group/fun/print/console?group={group}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/group/fun/print/console?group={group}&printLogLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
 
-### 分组内函数更新并输出到文件
+### 分组内函数更新并输出到文件（弃用）
 将分组的所有函数日志信息更新，并添加文件的appender，输出到文件
-> curl -X POST http://localhost:port/api/troy/log/group/fun/print/file?group={group}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/group/fun/print/file?group={group}&printLogLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
 
 ### 分组内函数更新并输出
 将分组的所有函数日志信息更新，并添加控制台和文件的appender，输出到控制台和文件
-> curl -X POST http://localhost:port/api/troy/log/group/fun/print/all?group={group}&logLevel={logLevel}&enable={enable}
+> curl -X POST http://localhost:port/api/troy/log/group/fun/print/all?group={group}&printLogLevel={logLevel}&enable={enable}
 
 输出（个数）：
 n
@@ -224,7 +263,7 @@ n
 输出（个数）：
 n
 
-### 添加某个logger并输出到文件
+### 添加某个logger并输出到文件（弃用）
 > curl -X POST http://localhost:port/api/troy/log/logger/name/file?loggerName={loggerName}&logLevel={logLevel}
 
 输出（个数）：
@@ -248,7 +287,7 @@ n
 输出（个数）：
 n
 
-### 添加自定义文件输出器
+### 添加自定义文件输出器（弃用）
 添加某个logger的appender到文件
 > curl -X POST http://localhost:port/api/troy/log/appender/file?loggerName={loggerName}&logLevel={logLevel}
 
