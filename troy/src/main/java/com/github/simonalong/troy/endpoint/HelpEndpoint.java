@@ -46,21 +46,21 @@ public class HelpEndpoint {
         infoMap.put("分组-日志", groupLogMap);
 
         Map<String, String> groupPrintMap = new LinkedHashMap<>();
-        groupPrintMap.put("输出变更：添加分组输出", "curl " + withJson() + " '" + apiPrefix() + "/group/(console/file/all)?group={group}&printLogLevel={logLevel}&enable={enable}'");
-        groupPrintMap.put("输出变更：添加函数输出", "curl " + withJson() + " '" + apiPrefix() + "/group/fun/print/(console/file/all)?funId={funId}&printLogLevel={logLevel}&enable={enable}'");
+        groupPrintMap.put("输出变更：添加分组输出", "curl " + withJson() + " '" + apiPrefix() + "/group/(console或者all)?group={group}&printLogLevel={logLevel}&enable={enable}'");
+        groupPrintMap.put("输出变更：添加函数输出", "curl " + withJson() + " '" + apiPrefix() + "/group/fun/print/(console或者all)?funId={funId}&printLogLevel={logLevel}&enable={enable}'");
         infoMap.put("分组-输出", groupPrintMap);
 
         Map<String, String> loggerMap = new LinkedHashMap<>();
         loggerMap.put("查询：logger列表", "curl '" + apiPrefix() + "/logger'");
         loggerMap.put("查询：logger搜索", "curl '" + apiPrefix() + "/logger/{loggerName}'");
-        loggerMap.put("更新：logger更新并输出", "curl " + withJson() + " '" + apiPrefix() + "/logger/appender/(console/file/all)?loggerName={loggerName}&logLevel={logLevel}'");
+        loggerMap.put("更新：logger更新并输出", "curl " + withJson() + " '" + apiPrefix() + "/logger/appender/(console或者all)?loggerName={loggerName}&logLevel={logLevel}'");
         loggerMap.put("更新：logger处理恢复", "curl " + withJson() + " '" + apiPrefix() + "/logger/restore/all/info?loggerName={loggerName}&logLevel={logLevel}'");
         infoMap.put("logger", loggerMap);
 
         Map<String, String> appenderMap = new LinkedHashMap<>();
-        appenderMap.put("更新：添加输出器", "curl " + withJson() + " '" + apiPrefix() + "/appender/(console/file/all)?loggerName={loggerName}&logLevel={logLevel}'");
+        appenderMap.put("更新：添加输出器", "curl " + withJson() + " '" + apiPrefix() + "/appender/(console或者all)?loggerName={loggerName}&logLevel={logLevel}'");
         appenderMap.put("删除：删除某个输出器", "curl -X DELETE '" + apiPrefix() + "/appender?loggerName={loggerName}'");
-        appenderMap.put("删除：删除输出器", "curl -X DELETE '" + apiPrefix() + "/appender/(console/file/all)?loggerName={loggerName}'");
+        appenderMap.put("删除：删除输出器", "curl -X DELETE '" + apiPrefix() + "/appender/(console或者all)?loggerName={loggerName}'");
         infoMap.put("appender", appenderMap);
 
         Map<String, String> envMap = new LinkedHashMap<>();
@@ -105,6 +105,4 @@ public class HelpEndpoint {
     private String withJson() {
         return "-X POST -H 'Content-Type: application/json'";
     }
-
-
 }

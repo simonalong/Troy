@@ -97,18 +97,15 @@ public class GroupEndpoint {
     public Integer updateGroupAllLoggerAndPrint(@Selector String arg0, String group, String printLogLevel, Boolean enable) {
         LoggerInvoker.updateLoggerBeanLog(group, printLogLevel, enable);
 
-        String loggerName = "com.github.simonalong.troy.log.LoggerInvoker";
+        String loggerName = "com.isyscore.os.troy.log.LoggerInvoker";
 
         // 设置logger的日志级别
         DynamicLogUtils.setLevelOfLogger(loggerName, printLogLevel);
 
         if ("console".equals(arg0)) {
             return DynamicLogUtils.addAppenderToConsole(loggerName, printLogLevel);
-        } else if ("file".equals(arg0)) {
-            return DynamicLogUtils.addAppenderToFile(loggerName, printLogLevel);
         } else if ("all".equals(arg0)) {
-            Integer count = DynamicLogUtils.addAppenderToConsole(loggerName, printLogLevel);
-            return count + DynamicLogUtils.addAppenderToFile(loggerName, printLogLevel);
+            return DynamicLogUtils.addAppenderToConsole(loggerName, printLogLevel);
         }
         return 0;
     }
@@ -143,19 +140,17 @@ public class GroupEndpoint {
     public Integer updateFunLoggerAndPrint(@Selector String arg0, @Selector String arg1, @Selector String arg2, String funId, String printLogLevel, Boolean enable) {
         LoggerInvoker.updateLoggerBeanLogOfFunId(funId, printLogLevel, enable);
 
-        String loggerName = "com.github.simonalong.troy.log.LoggerInvoker";
+        String loggerName = "com.isyscore.os.troy.log.LoggerInvoker";
 
         // 设置logger的日志级别
         DynamicLogUtils.setLevelOfLogger(loggerName, printLogLevel);
 
         if ("console".equals(arg2)) {
             return DynamicLogUtils.addAppenderToConsole(loggerName, printLogLevel);
-        } else if ("file".equals(arg2)) {
-            return DynamicLogUtils.addAppenderToFile(loggerName, printLogLevel);
         } else if ("all".equals(arg2)) {
-            DynamicLogUtils.addAppenderToFile(loggerName, printLogLevel);
             return DynamicLogUtils.addAppenderToConsole(loggerName, printLogLevel);
         }
         return 0;
     }
 }
+

@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author shizi
@@ -42,18 +45,21 @@ public class TroyBeanPostProcessor implements BeanPostProcessor {
             }
 
             Watcher classLogger = target.getClass().getAnnotation(Watcher.class);
-            Watcher methodLogger;
+            Watcher methodWatcher;
             for (Method declaredMethod : target.getClass().getDeclaredMethods()) {
-                methodLogger = declaredMethod.getDeclaredAnnotation(Watcher.class);
-                if (null == methodLogger) {
-                    methodLogger = classLogger;
+                Set<String> groups = new HashSet<>();
+                if (classLogger != null) {
+                    groups.addAll(Arrays.asList(classLogger.group()));
+                    groups.addAll(Arrays.asList(classLogger.value()));
                 }
 
-                if (null == methodLogger) {
-                    continue;
+                methodWatcher = declaredMethod.getDeclaredAnnotation(Watcher.class);
+                if (null != methodWatcher) {
+                    groups.addAll(Arrays.asList(methodWatcher.group()));
+                    groups.addAll(Arrays.asList(methodWatcher.value()));
                 }
 
-                LoggerInvoker.put(methodLogger.group(), declaredMethod.getDeclaringClass().getCanonicalName(), LoggerInvoker.generateMethodName(declaredMethod));
+                LoggerInvoker.put(groups, declaredMethod.getDeclaringClass().getCanonicalName(), LoggerInvoker.generateMethodName(declaredMethod));
             }
         } catch (Exception e) {
             e.printStackTrace();

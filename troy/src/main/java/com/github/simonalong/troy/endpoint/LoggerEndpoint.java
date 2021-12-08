@@ -40,7 +40,7 @@ public class LoggerEndpoint {
      */
     @ReadOperation
     public List<LoggerAllRspEntity> getLevelInfo(@Selector String arg0) {
-        return DynamicLogUtils.getAllLoggerList().stream().filter(e->e.getName().toLowerCase().contains(arg0)).map(this::loggerToEntity).collect(Collectors.toList());
+        return DynamicLogUtils.getAllLoggerList().stream().filter(e->e.getName().toLowerCase().contains(arg0.toLowerCase())).map(this::loggerToEntity).collect(Collectors.toList());
     }
 
     /**
@@ -76,11 +76,8 @@ public class LoggerEndpoint {
 
         if ("console".equals(arg1)) {
             return DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
-        } else if ("file".equals(arg1)) {
-            return DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
         } else if ("all".equals(arg1)) {
-            Integer count = DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
-            return count + DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
+            return DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
         } else {
             return 0;
         }

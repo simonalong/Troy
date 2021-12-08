@@ -37,13 +37,12 @@ public class LoggerInvoker {
         logLevelNameMap = Arrays.stream(LogLevel.values()).collect(Collectors.toMap(LogLevel::name, e -> e));
     }
 
-    public void put(String[] groups, String className, String logFunName) {
+    public void put(Set<String> groups, String className, String logFunName) {
         String hashKey = EncryptUtil.SHA256(logFunName);
         FunLoggerBeanWrapper beanWrapper = new FunLoggerBeanWrapper(className, logFunName);
 
-        List<String> groupList = new ArrayList<>(Arrays.asList(groups));
-        groupList.add(DEFAULT_GROUP);
-        groupList.forEach(group -> loggerProxyMap.compute(group, (k, v) -> {
+        groups.add(DEFAULT_GROUP);
+        groups.forEach(group -> loggerProxyMap.compute(group, (k, v) -> {
             if (null == v) {
                 Map<String, FunLoggerBeanWrapper> loggerBeanWrapperMap = new HashMap<>();
                 loggerBeanWrapperMap.put(hashKey, beanWrapper);
@@ -62,7 +61,7 @@ public class LoggerInvoker {
      * @param logFunName 日志
      * @return 激活结果
      */
-    public Boolean enableLogger(String[] groups, String logFunName) {
+    public Boolean enableLogger(Set<String> groups, String logFunName) {
         for (String group : groups) {
             if (loggerProxyMap.containsKey(group)) {
                 Map<String, FunLoggerBeanWrapper> beanWrapperMap = loggerProxyMap.get(group);
@@ -238,6 +237,9 @@ public class LoggerInvoker {
 
         for (String group : groups) {
             Map<String, FunLoggerBeanWrapper> loggerBeanWrapperMap = loggerProxyMap.get(group);
+            if (null == loggerBeanWrapperMap) {
+                continue;
+            }
             String funId = EncryptUtil.SHA256(logName);
             if (!loggerBeanWrapperMap.containsKey(funId)) {
                 continue;

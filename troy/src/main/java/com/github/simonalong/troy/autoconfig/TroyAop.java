@@ -11,6 +11,9 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author robot
@@ -29,26 +32,34 @@ public class TroyAop {
         MethodSignature methodSignature = (MethodSignature) sig;
 
         Method currentMethod = pjp.getTarget().getClass().getMethod(methodSignature.getName(), methodSignature.getParameterTypes());
-        Watcher watcher = null;
-        if (currentMethod.getDeclaringClass().isAnnotationPresent(Watcher.class)) {
-            watcher = currentMethod.getDeclaringClass().getAnnotation(Watcher.class);
-        }
-
-        if (currentMethod.isAnnotationPresent(Watcher.class)) {
-            watcher = currentMethod.getAnnotation(Watcher.class);
-        }
 
         Object result;
         try {
-            if (null != watcher) {
-                String[] groups = watcher.group();
-                String logName = LoggerInvoker.generateMethodName(currentMethod);
+            Set<String> groups = new HashSet<>();
+            Watcher watcher = null;
+            if (currentMethod.getDeclaringClass().isAnnotationPresent(Watcher.class)) {
+                watcher = currentMethod.getDeclaringClass().getAnnotation(Watcher.class);
+            }
 
-                if (LoggerInvoker.enableLogger(groups, logName)) {
-                    result = pjp.proceed();
-                    LoggerInvoker.postInvoke(currentMethod, pjp.getArgs(), result);
-                    return result;
-                }
+            if (null != watcher) {
+                groups.addAll(Arrays.asList(watcher.group()));
+                groups.addAll(Arrays.asList(watcher.value()));
+            }
+
+            if (currentMethod.isAnnotationPresent(Watcher.class)) {
+                watcher = currentMethod.getAnnotation(Watcher.class);
+            }
+
+            if (null != watcher) {
+                groups.addAll(Arrays.asList(watcher.group()));
+                groups.addAll(Arrays.asList(watcher.value()));
+            }
+
+            String logName = LoggerInvoker.generateMethodName(currentMethod);
+            if (LoggerInvoker.enableLogger(groups, logName)) {
+                result = pjp.proceed();
+                LoggerInvoker.postInvoke(currentMethod, pjp.getArgs(), result);
+                return result;
             }
             return pjp.proceed();
         } catch (Throwable e) {

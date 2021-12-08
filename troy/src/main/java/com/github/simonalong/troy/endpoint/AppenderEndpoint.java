@@ -27,11 +27,8 @@ public class AppenderEndpoint {
     public Integer addAppenderToSome(@Selector String arg0, String loggerName, String logLevel) {
         if ("console".equals(arg0)) {
             return DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
-        } else if ("file".equals(arg0)) {
-            return DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
         } else if ("all".equals(arg0)) {
-            DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
-            return DynamicLogUtils.addAppenderToFile(loggerName, logLevel);
+            return DynamicLogUtils.addAppenderToConsole(loggerName, logLevel);
         } else {
             return 0;
         }
@@ -59,11 +56,8 @@ public class AppenderEndpoint {
     public Integer deleteAppenderOfSome(@Selector String arg0, String loggerName) {
         if ("console".equals(arg0)) {
             return DynamicLogUtils.deleteAppenderOfConsole(loggerName);
-        } else if ("file".equals(arg0)) {
-            return DynamicLogUtils.deleteAppenderOfFile(loggerName);
         } else if ("all".equals(arg0)) {
-            DynamicLogUtils.deleteAppenderOfConsole(loggerName);
-            return DynamicLogUtils.deleteAppenderOfFile(loggerName);
+            return DynamicLogUtils.deleteAppenderOfConsole(loggerName);
         } else {
             return 0;
         }
