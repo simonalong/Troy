@@ -59,7 +59,9 @@ public class TroyBeanPostProcessor implements BeanPostProcessor {
                     groups.addAll(Arrays.asList(methodWatcher.value()));
                 }
 
-                LoggerInvoker.put(groups, declaredMethod.getDeclaringClass().getCanonicalName(), LoggerInvoker.generateMethodName(declaredMethod));
+                if (!groups.isEmpty()) {
+                    LoggerInvoker.put(groups, declaredMethod.getDeclaringClass().getCanonicalName(), LoggerInvoker.generateMethodName(declaredMethod));
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
