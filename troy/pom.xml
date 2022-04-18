@@ -9,6 +9,31 @@
     <version>1.0.0</version>
 
     <name>troy</name>
+    <url>https://github.com/simonalong/Troy</url>
+    <description>日志管理框架Troy</description>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>zhouzhenyong</name>
+            <email>simonalongs@126.com</email>
+            <roles>
+                <role>owner</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@github.com:simonalong/Troy.git</connection>
+        <developerConnection>scm:git:git@github.com:simonalong/Troy.git</developerConnection>
+        <url>git@github.com:simonalong/Troy.git</url>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
