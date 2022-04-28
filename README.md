@@ -60,34 +60,37 @@ public class BusinessController {
 ```json
 {
     "help":{
-        "help 查询：命令列表":"curl http://localhost:port/api/troy/log/help",
-        "help 查询：修改ip和port":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/help?ip={ip}&port={port}'"
+        "help 查询：命令列表":"curl http://localhost:port/api/app/log/help",
+        "help 查询：修改ip和port":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/app/log/help?ip={ip}&port={port}'"
     },
     "分组":{
-        "查询：分组列表":"curl 'http://localhost:port/api/troy/log/group/list'",
-        "查询：分组函数列表":"curl 'http://localhost:port/api/troy/log/group/fun/list?group={group}'",
-        "变更：更新分组信息":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/group?group={group}&printLogLevel={logLevel}&enable={enable}'",
-        "变更：某个函数更新":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/group/fun/change?funId={funId}&printLogLevel={logLevel}&enable={enable}'"
+        "查询：分组列表":"curl 'http://localhost:port/api/app/log/group/list'",
+        "查询：分组函数列表":"curl 'http://localhost:port/api/app/log/group/fun/list?group={group}'",
+        "变更：更新分组信息":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/app/log/group?group={group}&printLogLevel={logLevel}&enable={enable}'",
+        "变更：某个函数更新":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/app/log/group/fun/change?funId={funId}&printLogLevel={logLevel}&enable={enable}'"
     },
     "分组-日志":{
-        "日志查询：分组某个函数信息":"curl 'http://localhost:port/api/troy/log/group/fun/info/one/logger?logFunId={funId}'",
-        "日志查询：分组函数全部信息":"curl 'http://localhost:port/api/troy/log/group/fun/info/all?group={group}'"
+        "日志查询：分组某个函数信息":"curl 'http://localhost:port/api/app/log/group/fun/info/one/logger?logFunId={funId}'",
+        "日志查询：分组函数全部信息":"curl 'http://localhost:port/api/app/log/group/fun/info/all?group={group}'"
     },
     "分组-输出":{
-        "输出变更：添加分组输出":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/group/(console或者all)?group={group}&printLogLevel={logLevel}&enable={enable}'",
-        "输出变更：添加函数输出":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/group/fun/print/(console或者all)?funId={funId}&printLogLevel={logLevel}&enable={enable}'"
+        "输出变更：添加分组输出":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/app/log/group/(console或者all)?group={group}&printLogLevel={logLevel}&enable={enable}'",
+        "输出变更：添加函数输出":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/app/log/group/fun/print/(console或者all)?funId={funId}&printLogLevel={logLevel}&enable={enable}'"
     },
     "logger":{
-        "查询：logger列表":"curl 'http://localhost:port/api/troy/log/logger'",
-        "查询：logger搜索":"curl 'http://localhost:port/api/troy/log/logger/{loggerName}'",
-        "更新：logger更新级别":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/logger?loggerName={loggerName}&logLevel={logLevel}'",
-        "更新：logger更新并输出":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/logger/appender/(console或者all)?loggerName={loggerName}&logLevel={logLevel}'",
-        "更新：logger处理恢复":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/logger/restore/all/info?loggerName={loggerName}&logLevel={logLevel}'"
+        "查询：logger列表":"curl 'http://localhost:port/api/app/log/logger'",
+        "查询：logger搜索":"curl 'http://localhost:port/api/app/log/logger/{loggerName}'",
+        "更新：logger更新并输出":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/app/log/logger/appender/(console或者all)?loggerName={loggerName}&logLevel={logLevel}'",
+        "更新：logger处理恢复":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/app/log/logger/restore/all/info?loggerName={loggerName}&logLevel={logLevel}'"
     },
     "appender":{
-        "更新：添加输出器":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/troy/log/appender/(console或者all)?loggerName={loggerName}&logLevel={logLevel}'",
-        "删除：删除某个输出器":"curl -X DELETE 'http://localhost:port/api/troy/log/appender?loggerName={loggerName}'",
-        "删除：删除输出器":"curl -X DELETE 'http://localhost:port/api/troy/log/appender/(console或者all)?loggerName={loggerName}'"
+        "更新：添加输出器":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/app/log/appender/(console或者all)?loggerName={loggerName}&logLevel={logLevel}'",
+        "删除：删除某个输出器":"curl -X DELETE 'http://localhost:port/api/app/log/appender?loggerName={loggerName}'",
+        "删除：删除输出器":"curl -X DELETE 'http://localhost:port/api/app/log/appender/(console或者all)?loggerName={loggerName}'"
+    },
+    "环境变量":{
+        "设置：环境变量":"curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/app/log/en/set?key={key}&value={value}'",
+        "查询：环境变量":"curl 'http://localhost:port/api/app/log/en/get?key={key}'"
     }
 }
 ```
