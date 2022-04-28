@@ -10,9 +10,9 @@
 # jar包引入
 ```xml
 <dependency>
-    <groupId>com.github.simonalong</groupId>
-    <artifactId>troy</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+  <groupId>com.github.simonalong</groupId>
+  <artifactId>troy</artifactId>
+  <version>1.0.0</version>
 </dependency>
 ```
 
