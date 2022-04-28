@@ -1,12 +1,19 @@
 ## Troy
-日志在线管理框架
+在线管理框架
 
 # 背景
-在工作中遇到这么两个问题，然后根据对应问题编写了这么一个框架
+在工作中遇到这么两个问题，然后根据对应问题编写了这么一个框架，用于管理日志
 1. 线上日志为info级别，但是我想看我的那块debug代码打印的日志，不想重启代码怎么办？
 2. 线上出现问题不好排查，想查看某个函数的出入参，不想重启代码怎么办？
 
 对于以上两个问题，该框架提供了对应的方案，其中日志框架底层采用的是logback
+
+---
+
+1.0.0版本提供功能
+1. 日志在线管理：动态修改root级别，以及相关logger级别
+2. 环境变量在线管理：动态修改以及查看环境变量
+
 # jar包引入
 ```xml
 <dependency>
@@ -26,32 +33,6 @@ troy:
     # 是否启用。默认启用
     enable: true
 ```
-
-对于该框架有如下几种用法
-## 一、分组使用
-这里对代码有侵入，提供注解`@Watcher`，修饰类和函数，函数会覆盖类的使用。
-
-#### 使用场景：
-对于一些平常不需要打印日志，但是在定位问题时候，就需要知道某个函数的出入参这种，就可以使用
-
-```java
-@Watcher(group = "business")
-@RequestMapping("api/sample/biz")
-@RestController
-public class BusinessController {
-
-    @Autowired
-    private BusinessService businessService;
-
-    @Watcher(group = "insert")
-    @PostMapping("troyTest")
-    public FunRsp troyTest(@RequestBody Fun1Req fun1Req) {
-        return businessService.troyTest(fun1Req);
-    }
-    // ... 省略更多 ...
-}
-```
-提示：修饰函数，则函数会覆盖类的注解
 
 ### 查看帮助
 > curl http://localhost:port/api/troy/log/help
@@ -94,6 +75,32 @@ public class BusinessController {
     }
 }
 ```
+
+对于该框架有如下几种用法
+## 一、分组使用
+这里对代码有侵入，提供注解`@Watcher`，修饰类和函数，函数会覆盖类的使用。
+
+#### 使用场景：
+对于一些平常不需要打印日志，但是在定位问题时候，就需要知道某个函数的出入参这种，就可以使用
+
+```java
+@Watcher(group = "business")
+@RequestMapping("api/sample/biz")
+@RestController
+public class BusinessController {
+
+    @Autowired
+    private BusinessService businessService;
+
+    @Watcher(group = "insert")
+    @PostMapping("troyTest")
+    public FunRsp troyTest(@RequestBody Fun1Req fun1Req) {
+        return businessService.troyTest(fun1Req);
+    }
+    // ... 省略更多 ...
+}
+```
+提示：修饰函数，则函数会覆盖类的注解
 
 ### 所有分组列表
 > curl http://localhost:port/api/troy/log/group/list
@@ -215,7 +222,7 @@ n
 n
 
 
-## logger（日志记录器）
+## 二、logger（日志记录器）
 
 ### 查看所有logger
 > curl http://localhost:port/api/troy/log/logger
@@ -332,3 +339,21 @@ n
 输出（个数）：
 n
 
+
+## 三、环境变量
+本工具也提供对环境变量的修改，可以动态的修改一些环境变量，在排查问题时候非常有帮助
+
+```java
+// 代码中使用如下
+System.getProperty("xxx")
+```
+
+设置环境变量
+```shell script
+curl -X POST -H 'Content-Type: application/json' 'http://localhost:port/api/app/log/en/set?key={key}&value={value}'
+```
+
+查询环境变量
+```shell script
+curl 'http://localhost:port/api/app/log/en/get?key={key}'
+```
