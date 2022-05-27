@@ -1,6 +1,7 @@
 package com.github.simonalong.troy.autoconfig;
 
 import com.github.simonalong.troy.endpoint.*;
+import com.github.simonalong.troy.util.SpringBeanUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -30,7 +31,7 @@ public class TroyAutoConfiguration {
 
     @Bean
     public TroyBeanPostProcessor beanPostProcessor(TroyProperties troyProperties) {
-        List<String> endpointList = Arrays.asList(HELP, GROUP, LOGGER, APPENDER, ENVIRONMENT);
+        List<String> endpointList = Arrays.asList(HELP, GROUP, LOGGER, APPENDER, ENVIRONMENT, BEAN);
         System.setProperty("management.endpoints.web.exposure.include", String.join(", ", endpointList));
         System.setProperty("management.endpoints.web.basePath", DEFAULT_API_PREFIX);
 
@@ -44,6 +45,11 @@ public class TroyAutoConfiguration {
     @Bean
     public TroyAop troyAop() {
         return new TroyAop();
+    }
+
+    @Bean
+    public SpringBeanUtils springBeanUtils() {
+        return new SpringBeanUtils();
     }
 
     @Configuration
@@ -77,6 +83,12 @@ public class TroyAutoConfiguration {
         @ConditionalOnMissingBean
         public EnvEndpoint troyEnv() {
             return new EnvEndpoint();
+        }
+
+        @Bean
+        @ConditionalOnMissingBean
+        public BeanEndpoint troyBean() {
+            return new BeanEndpoint();
         }
     }
 }

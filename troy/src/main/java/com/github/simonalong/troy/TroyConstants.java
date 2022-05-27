@@ -32,6 +32,10 @@ public interface TroyConstants {
      */
     String ENVIRONMENT = "en";
     /**
+     * bean
+     */
+    String BEAN = "bean";
+    /**
      * 功能api帮助
      */
     String HELP = "help";

@@ -67,6 +67,14 @@ public class HelpEndpoint {
         envMap.put("设置：环境变量", "curl " + withJson() + " '" + apiPrefix() + "/en/set?key={key}&value={value}'");
         envMap.put("查询：环境变量", "curl '" + apiPrefix() + "/en/get?key={key}'");
         infoMap.put("环境变量", envMap);
+
+        Map<String, String> beanMap = new LinkedHashMap<>();
+        beanMap.put("查询：所有bean名字", "curl " + apiPrefix() + "/bean/names");
+        beanMap.put("查询：搜索bean名字", "curl '" + apiPrefix() + "/bean/names?name={name}'");
+        beanMap.put("查询：查询bean属性值", "curl '" + apiPrefix() + "/bean/get/field?name={name}&field={field}'");
+        beanMap.put("设置：设置bean属性值", "curl " + withJson() + " '" + apiPrefix() + "/bean/set/field?name={name}' -d '{xx:xx}'");
+        beanMap.put("调用：函数调用", "curl " + withJson() + " '" + apiPrefix() + "/bean/call/fun?name={name}&fun={fun}' -d '{p1:x, p2:xx}'");
+        infoMap.put("bean管理", beanMap);
         return infoMap;
     }
 

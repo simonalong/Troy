@@ -291,7 +291,7 @@ public class ObjectUtil {
      * @return 转换后的值
      */
     @SuppressWarnings("unchecked")
-    public <T> T cast(Class<? extends T> tClass, Object value) {
+    public <T> Object cast(Class<? extends T> tClass, Object value) {
         if (null == tClass || null == value) {
             return null;
         }
@@ -361,11 +361,26 @@ public class ObjectUtil {
             return castStr(tClass, String.valueOf(value));
         }
 
-        if (value instanceof String) {
-            return JSON.parseObject((String) value, tClass);
+        // value为String类型，则最后按照实体类型的json进行转换
+        if (String.class.isAssignableFrom(value.getClass())) {
+            String valueStr = (String) value;
+            if (valueStr.startsWith("{")) {
+                return JSON.parseObject((String) value, tClass);
+            } else if (valueStr.startsWith("[")){
+                return JSON.parseArray((String) value, tClass);
+            }
+            return null;
         }
 
-        throw new RuntimeException("值 " + value + " 向类型 " + tClass.getName() + " 转换异常");
+        try{
+            return JSON.parseObject(JSON.toJSONString(value), tClass);
+        } catch (Throwable e) {
+            try {
+                return JSON.parseObject(JSON.toJSONString(value), tClass);
+            } catch (Throwable e2) {
+                throw new RuntimeException("值 " + value + " 向类型 " + tClass.getName() + " 转换异常");
+            }
+        }
     }
 
     /**
@@ -431,3 +446,4 @@ public class ObjectUtil {
         return !isEmpty(object);
     }
 }
+

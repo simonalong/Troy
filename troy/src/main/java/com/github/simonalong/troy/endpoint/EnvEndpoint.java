@@ -32,8 +32,8 @@ public class EnvEndpoint {
     /**
      * 读取环境变量
      *
-     * @param arg0  get
-     * @param key   key
+     * @param arg0 get
+     * @param key  key
      * @return 添加结果：0-没有添加成功，1-添加成功
      */
     @ReadOperation
